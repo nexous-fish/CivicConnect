@@ -17,6 +17,14 @@ import {
   CardVisual, 
   Visual1 
 } from "@/components/ui/animated-card";
+import { 
+  AnimatedCard as AnimatedChartCard, 
+  CardBody as ChartCardBody, 
+  CardDescription as ChartCardDescription, 
+  CardTitle as ChartCardTitle, 
+  CardVisual as ChartCardVisual, 
+  Visual3 
+} from "@/components/ui/animated-card-chart";
 
 const Index = () => {
   const [showWizard, setShowWizard] = useState(false);
@@ -191,6 +199,21 @@ const Index = () => {
                 </AnimatedCardDescription>
               </AnimatedCardBody>
             </AnimatedCard>
+          </div>
+
+          {/* Additional Animated Chart Cards */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 justify-items-center">
+            <AnimatedChartCard>
+              <ChartCardVisual>
+                <Visual3 mainColor="#0ea5e9" secondaryColor="#10b981" />
+              </ChartCardVisual>
+              <ChartCardBody>
+                <ChartCardTitle>Weekly Resolution Analytics</ChartCardTitle>
+                <ChartCardDescription>
+                  Interactive chart showing complaint resolution rates with 15.2% improvement in response time
+                </ChartCardDescription>
+              </ChartCardBody>
+            </AnimatedChartCard>
           </div>
 
           {/* India Map */}
