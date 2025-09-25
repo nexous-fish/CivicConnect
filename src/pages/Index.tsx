@@ -8,6 +8,7 @@ import IndiaMap from "@/components/IndiaMap";
 import ComplaintWizard from "@/components/ComplaintWizard";
 import StatsCard from "@/components/StatsCard";
 import CivicIssuesSlider from "@/components/CivicIssuesSlider";
+import CivicAnimatedCard from "@/components/CivicAnimatedCard";
 
 const Index = () => {
   const [showWizard, setShowWizard] = useState(false);
@@ -148,6 +149,28 @@ const Index = () => {
               description="Garbage & cleanliness"
               icon={TrendingUp}
               color="success"
+            />
+          </div>
+
+          {/* Animated Cards Section */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 justify-items-center">
+            <CivicAnimatedCard
+              title="Resolution Rate Analytics"
+              description="Real-time complaint resolution tracking with interactive visualization"
+              mainColor="#0ea5e9"
+              secondaryColor="#10b981"
+            />
+            <CivicAnimatedCard
+              title="Priority Issues Monitor"
+              description="Critical infrastructure issues requiring immediate attention"
+              mainColor="#ef4444"
+              secondaryColor="#f59e0b"
+            />
+            <CivicAnimatedCard
+              title="Community Impact Score"
+              description="Measuring the positive changes in your local community"
+              mainColor="#8b5cf6"
+              secondaryColor="#ec4899"
             />
           </div>
 
