@@ -74,6 +74,12 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     }
   };
 
+  const handleCameraCapture = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      setComplaintData({ ...complaintData, photo: event.target.files[0] });
+    }
+  };
+
   if (currentStep === 6) {
     return (
       <Card className="w-full max-w-md mx-auto card-shadow">
@@ -123,26 +129,51 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           {/* Step 1: Photo Upload */}
           {currentStep === 1 && (
             <div className="space-y-4">
-              <div className="border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-civic transition-colors cursor-pointer">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handlePhotoUpload}
-                  className="hidden"
-                  id="photo-upload"
-                />
-                <label htmlFor="photo-upload" className="cursor-pointer">
-                  <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground">
-                    Click to upload or drag & drop
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    JPG, PNG up to 10MB
-                  </p>
-                </label>
+              <div className="grid grid-cols-1 gap-4">
+                {/* Upload from gallery */}
+                <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-civic transition-colors cursor-pointer">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handlePhotoUpload}
+                    className="hidden"
+                    id="photo-upload"
+                  />
+                  <label htmlFor="photo-upload" className="cursor-pointer">
+                    <Upload className="w-6 h-6 mx-auto mb-2 text-muted-foreground" />
+                    <p className="text-sm text-muted-foreground">
+                      Upload from gallery
+                    </p>
+                  </label>
+                </div>
+
+                {/* Take photo with camera */}
+                <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-civic transition-colors cursor-pointer">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    onChange={handleCameraCapture}
+                    className="hidden"
+                    id="camera-capture"
+                  />
+                  <label htmlFor="camera-capture" className="cursor-pointer">
+                    <Camera className="w-6 h-6 mx-auto mb-2 text-muted-foreground" />
+                    <p className="text-sm text-muted-foreground">
+                      Take photo
+                    </p>
+                  </label>
+                </div>
               </div>
+
+              <div className="text-center">
+                <p className="text-xs text-muted-foreground">
+                  JPG, PNG up to 10MB
+                </p>
+              </div>
+
               {complaintData.photo && (
-                <p className="text-sm text-success">✓ Photo uploaded: {complaintData.photo.name}</p>
+                <p className="text-sm text-success text-center">✓ Photo captured: {complaintData.photo.name}</p>
               )}
             </div>
           )}
