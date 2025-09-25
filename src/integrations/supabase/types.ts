@@ -14,7 +14,244 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      cities: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          state_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          state_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          state_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cities_state_id_fkey"
+            columns: ["state_id"]
+            isOneToOne: false
+            referencedRelation: "states"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      complaints: {
+        Row: {
+          address: string | null
+          assigned_at: string | null
+          assigned_contractor_id: string | null
+          category: Database["public"]["Enums"]["complaint_category"]
+          citizen_name: string
+          citizen_phone: string
+          city_id: string
+          created_at: string
+          description: string
+          id: string
+          latitude: number | null
+          longitude: number | null
+          nagar_id: string
+          photo_url: string | null
+          resolved_at: string | null
+          state_id: string
+          status: Database["public"]["Enums"]["complaint_status"]
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          assigned_at?: string | null
+          assigned_contractor_id?: string | null
+          category: Database["public"]["Enums"]["complaint_category"]
+          citizen_name: string
+          citizen_phone: string
+          city_id: string
+          created_at?: string
+          description: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          nagar_id: string
+          photo_url?: string | null
+          resolved_at?: string | null
+          state_id: string
+          status?: Database["public"]["Enums"]["complaint_status"]
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          assigned_at?: string | null
+          assigned_contractor_id?: string | null
+          category?: Database["public"]["Enums"]["complaint_category"]
+          citizen_name?: string
+          citizen_phone?: string
+          city_id?: string
+          created_at?: string
+          description?: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          nagar_id?: string
+          photo_url?: string | null
+          resolved_at?: string | null
+          state_id?: string
+          status?: Database["public"]["Enums"]["complaint_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "complaints_assigned_contractor_id_fkey"
+            columns: ["assigned_contractor_id"]
+            isOneToOne: false
+            referencedRelation: "contractors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "complaints_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "complaints_nagar_id_fkey"
+            columns: ["nagar_id"]
+            isOneToOne: false
+            referencedRelation: "nagars"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "complaints_state_id_fkey"
+            columns: ["state_id"]
+            isOneToOne: false
+            referencedRelation: "states"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contractors: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          nagar_id: string
+          name: string
+          phone: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          nagar_id: string
+          name: string
+          phone: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          nagar_id?: string
+          name?: string
+          phone?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contractors_nagar_id_fkey"
+            columns: ["nagar_id"]
+            isOneToOne: false
+            referencedRelation: "nagars"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      nagars: {
+        Row: {
+          city_id: string
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          city_id: string
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          city_id?: string
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nagars_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      officers: {
+        Row: {
+          city_id: string
+          created_at: string
+          email: string
+          id: string
+          name: string
+          user_id: string
+        }
+        Insert: {
+          city_id: string
+          created_at?: string
+          email: string
+          id?: string
+          name: string
+          user_id: string
+        }
+        Update: {
+          city_id?: string
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "officers_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      states: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +260,13 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      complaint_category: "roads" | "sewage" | "sanitation"
+      complaint_status:
+        | "pending"
+        | "assigned"
+        | "in_progress"
+        | "resolved"
+        | "delayed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +393,15 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      complaint_category: ["roads", "sewage", "sanitation"],
+      complaint_status: [
+        "pending",
+        "assigned",
+        "in_progress",
+        "resolved",
+        "delayed",
+      ],
+    },
   },
 } as const

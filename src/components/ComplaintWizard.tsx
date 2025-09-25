@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,40 +7,127 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
 import { Upload, Camera, MapPin, Phone, FileText, CheckCircle, ArrowLeft, ArrowRight } from 'lucide-react';
+import { supabase } from "@/integrations/supabase/client";
 
 interface ComplaintData {
   photo: File | null;
-  municipality: string;
+  state_id: string;
+  city_id: string;
+  nagar_id: string;
   address: string;
   phone: string;
   details: string;
   category: string;
 }
 
+interface State {
+  id: string;
+  name: string;
+}
+
+interface City {
+  id: string;
+  name: string;
+  state_id: string;
+}
+
+interface Nagar {
+  id: string;
+  name: string;
+  city_id: string;
+}
+
 const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [complaintData, setComplaintData] = useState<ComplaintData>({
     photo: null,
-    municipality: '',
+    state_id: '',
+    city_id: '',
+    nagar_id: '',
     address: '',
     phone: '',
     details: '',
     category: ''
   });
 
+  const [states, setStates] = useState<State[]>([]);
+  const [cities, setCities] = useState<City[]>([]);
+  const [nagars, setNagars] = useState<Nagar[]>([]);
+  const [loading, setLoading] = useState(false);
+
   const totalSteps = 5;
   const progress = (currentStep / totalSteps) * 100;
 
-  const municipalities = [
-    'Mumbai Municipal Corporation',
-    'Delhi Municipal Corporation', 
-    'Bangalore Municipal Corporation',
-    'Chennai Municipal Corporation',
-    'Kolkata Municipal Corporation',
-    'Hyderabad Municipal Corporation',
-    'Pune Municipal Corporation',
-    'Ahmedabad Municipal Corporation'
-  ];
+  // Fetch states on component mount
+  useEffect(() => {
+    fetchStates();
+  }, []);
+
+  // Fetch cities when state changes
+  useEffect(() => {
+    if (complaintData.state_id) {
+      fetchCities(complaintData.state_id);
+      setComplaintData(prev => ({ ...prev, city_id: '', nagar_id: '' }));
+    }
+  }, [complaintData.state_id]);
+
+  // Fetch nagars when city changes
+  useEffect(() => {
+    if (complaintData.city_id) {
+      fetchNagars(complaintData.city_id);
+      setComplaintData(prev => ({ ...prev, nagar_id: '' }));
+    }
+  }, [complaintData.city_id]);
+
+  const fetchStates = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('states')
+        .select('id, name')
+        .order('name');
+      
+      if (error) throw error;
+      setStates(data || []);
+    } catch (error) {
+      console.error('Error fetching states:', error);
+    }
+  };
+
+  const fetchCities = async (stateId: string) => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('cities')
+        .select('id, name, state_id')
+        .eq('state_id', stateId)
+        .order('name');
+      
+      if (error) throw error;
+      setCities(data || []);
+    } catch (error) {
+      console.error('Error fetching cities:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchNagars = async (cityId: string) => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('nagars')
+        .select('id, name, city_id')
+        .eq('city_id', cityId)
+        .order('name');
+      
+      if (error) throw error;
+      setNagars(data || []);
+    } catch (error) {
+      console.error('Error fetching nagars:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const categories = [
     { value: 'roads', label: 'Roads (Potholes, Broken roads)', icon: '🕳️' },
@@ -88,7 +175,7 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           <CheckCircle className="w-16 h-16 text-success mx-auto mb-4" />
           <h2 className="text-xl font-bold text-success mb-2">Thank You!</h2>
           <p className="text-muted-foreground mb-4">
-            Your complaint has been submitted to {complaintData.municipality}
+            Your complaint has been submitted successfully
           </p>
           <div className="bg-success/10 p-4 rounded-lg">
             <p className="text-sm text-success font-medium">
@@ -206,21 +293,80 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             </div>
           )}
 
-          {/* Step 3: Municipality & Address */}
+          {/* Step 3: Location Selection */}
           {currentStep === 3 && (
             <div className="space-y-4">
               <div>
-                <Label htmlFor="municipality">Municipality/City</Label>
-                <Select value={complaintData.municipality} onValueChange={(value) => 
-                  setComplaintData({ ...complaintData, municipality: value })
-                }>
+                <Label htmlFor="state">State</Label>
+                <Select 
+                  value={complaintData.state_id} 
+                  onValueChange={(value) => 
+                    setComplaintData({ ...complaintData, state_id: value })
+                  }
+                >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select your municipality" />
+                    <SelectValue placeholder="Select your state" />
                   </SelectTrigger>
-                  <SelectContent>
-                    {municipalities.map((municipality) => (
-                      <SelectItem key={municipality} value={municipality}>
-                        {municipality}
+                  <SelectContent className="bg-background border shadow-lg z-50">
+                    {states.map((state) => (
+                      <SelectItem key={state.id} value={state.id}>
+                        {state.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="city">City</Label>
+                <Select 
+                  value={complaintData.city_id} 
+                  onValueChange={(value) => 
+                    setComplaintData({ ...complaintData, city_id: value })
+                  }
+                  disabled={!complaintData.state_id || loading}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={
+                      !complaintData.state_id 
+                        ? "Select state first" 
+                        : loading 
+                          ? "Loading cities..." 
+                          : "Select your city"
+                    } />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background border shadow-lg z-50">
+                    {cities.map((city) => (
+                      <SelectItem key={city.id} value={city.id}>
+                        {city.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="nagar">Nagar/Ward</Label>
+                <Select 
+                  value={complaintData.nagar_id} 
+                  onValueChange={(value) => 
+                    setComplaintData({ ...complaintData, nagar_id: value })
+                  }
+                  disabled={!complaintData.city_id || loading}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={
+                      !complaintData.city_id 
+                        ? "Select city first" 
+                        : loading 
+                          ? "Loading nagars..." 
+                          : "Select your nagar/ward"
+                    } />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background border shadow-lg z-50">
+                    {nagars.map((nagar) => (
+                      <SelectItem key={nagar.id} value={nagar.id}>
+                        {nagar.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
