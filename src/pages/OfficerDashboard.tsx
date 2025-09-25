@@ -1,24 +1,28 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { OfficerSidebar } from "@/components/OfficerSidebar";
 import ComplaintStats from "@/components/ComplaintStats";
 import ComplaintCharts from "@/components/ComplaintCharts";
 import ComplaintTable from "@/components/ComplaintTable";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+
+// Demo data for stable initial render
+const DEMO_STATS = {
+  total: 328,
+  resolved: 245,
+  pending: 67,
+  delayed: 16,
+};
 
 const OfficerDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [officerData, setOfficerData] = useState<any>(null);
-  const [stats, setStats] = useState({
-    total: 0,
-    resolved: 0,
-    pending: 0,
-    delayed: 0,
-  });
+  const [stats, setStats] = useState(DEMO_STATS);
 
   useEffect(() => {
     checkAuthAndFetchData();
@@ -71,18 +75,8 @@ const OfficerDashboard: React.FC = () => {
         .from('complaints')
         .select('status, created_at');
 
-      if (error) {
-        console.error('Error fetching complaints:', error);
-        // Use demo data if there's an error
-        setStats({ total: 328, resolved: 245, pending: 67, delayed: 16 });
-        return;
-      }
-
-      console.log('Fetched complaints:', complaints);
-
-      if (!complaints || complaints.length === 0) {
-        // Use demo data if no complaints exist
-        setStats({ total: 328, resolved: 245, pending: 67, delayed: 16 });
+      if (error || !complaints || complaints.length === 0) {
+        // Keep demo data, don't update if fetch fails
         return;
       }
 
@@ -99,12 +93,12 @@ const OfficerDashboard: React.FC = () => {
         return daysDiff > 7;
       }).length;
 
+      // Only update if we have real data
       setStats({ total, resolved, pending, delayed });
       
     } catch (error) {
       console.error('Error in fetchComplaintStats:', error);
-      // Use demo data if there's an error
-      setStats({ total: 328, resolved: 245, pending: 67, delayed: 16 });
+      // Keep existing stats, don't update on error
     }
   };
 
@@ -162,19 +156,25 @@ const OfficerDashboard: React.FC = () => {
           {/* Main Content */}
           <div className="p-6 space-y-8 bg-gradient-to-br from-background via-background to-muted/20 min-h-screen">
             {/* Stats Cards */}
-            <div className="animate-fade-in">
-              <ComplaintStats stats={stats} />
-            </div>
+            <ErrorBoundary>
+              <div className="transform translate-y-0 opacity-100 transition-all duration-300">
+                <ComplaintStats stats={stats} />
+              </div>
+            </ErrorBoundary>
             
             {/* Charts */}
-            <div className="animate-fade-in" style={{ animationDelay: '0.1s' }}>
-              <ComplaintCharts />
-            </div>
+            <ErrorBoundary>
+              <div className="transform translate-y-0 opacity-100 transition-all duration-300" style={{ transitionDelay: '100ms' }}>
+                <ComplaintCharts />
+              </div>
+            </ErrorBoundary>
             
             {/* Complaint Table */}
-            <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              <ComplaintTable />
-            </div>
+            <ErrorBoundary>
+              <div className="transform translate-y-0 opacity-100 transition-all duration-300" style={{ transitionDelay: '200ms' }}>
+                <ComplaintTable />
+              </div>
+            </ErrorBoundary>
           </div>
         </main>
       </div>

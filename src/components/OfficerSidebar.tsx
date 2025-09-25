@@ -5,7 +5,6 @@ import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -18,9 +17,8 @@ import {
   BarChart3,
   Settings,
   LogOut,
-  Shield,
-  ChevronLeft,
-  ChevronRight
+  Building2,
+  Menu
 } from 'lucide-react';
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from 'react-router-dom';
@@ -39,7 +37,6 @@ export function OfficerSidebar() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { open, setOpen } = useSidebar();
-  const collapsed = !open;
   const currentPath = location.pathname;
 
   const isActive = (path: string) => currentPath === path || currentPath.startsWith(`${path}/`);
@@ -59,102 +56,83 @@ export function OfficerSidebar() {
     }
   };
 
-  const getNavCls = ({ isActive }: { isActive: boolean }) =>
-    `group flex items-center w-full p-3 rounded-xl transition-all duration-300 ${
-      isActive
-        ? "bg-gradient-to-r from-primary/10 to-civic/10 text-primary border-l-4 border-primary font-semibold shadow-lg backdrop-blur-sm"
-        : "text-white/80 hover:bg-white/10 hover:text-white hover:backdrop-blur-sm hover:shadow-md"
-    }`;
-
   return (
-    <Sidebar className={`${collapsed ? 'w-16' : 'w-72'} bg-gradient-to-b from-primary via-primary/95 to-primary/90 border-r-0 shadow-2xl backdrop-blur-xl transition-all duration-300`}>
-      <SidebarContent className="bg-transparent relative">
-        {/* Glassmorphism overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent backdrop-blur-sm rounded-r-3xl" />
-        
-        {/* Header */}
-        <div className="relative flex items-center justify-between p-6 border-b border-white/10 backdrop-blur-sm">
-          <div className={`flex items-center space-x-3 transition-opacity duration-300 ${collapsed ? 'opacity-0 w-0' : 'opacity-100'}`}>
-            <div className="w-12 h-12 bg-gradient-to-br from-civic to-warning rounded-2xl flex items-center justify-center shadow-lg">
-              <Shield className="w-7 h-7 text-white drop-shadow-sm" />
-            </div>
-            <div>
-              <h1 className="text-white font-bold text-xl tracking-tight">Officer Portal</h1>
-              <p className="text-white/70 text-sm font-medium">Municipal Dashboard</p>
+    <Sidebar
+      className={`transition-all duration-200 ease-out ${
+        open 
+          ? "w-72" 
+          : "w-16"
+      }`}
+      collapsible="icon"
+    >
+      <SidebarContent className="bg-white/95 backdrop-blur-md border-r border-gray-200 relative">
+        <div className="h-full flex flex-col">
+          {/* Header */}
+          <div className="p-4 border-b border-gray-100">
+            <div className="flex items-center justify-between">
+              <div className={`flex items-center space-x-3 transition-opacity duration-200 ${!open && 'opacity-0'}`}>
+                <div className="w-8 h-8 bg-gradient-to-br from-primary to-civic rounded-lg flex items-center justify-center">
+                  <Building2 className="w-4 h-4 text-white" />
+                </div>
+                {open && (
+                  <div>
+                    <h1 className="text-lg font-bold text-foreground">CivicPortal</h1>
+                    <p className="text-xs text-muted-foreground">Officer Dashboard</p>
+                  </div>
+                )}
+              </div>
+              <button
+                onClick={toggleSidebar}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+              >
+                <Menu className="w-4 h-4 text-foreground" />
+              </button>
             </div>
           </div>
-          
-          {/* Toggle Button */}
-          <button
-            onClick={toggleSidebar}
-            className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all duration-300 hover:scale-105 backdrop-blur-sm border border-white/20"
-          >
-            {collapsed ? (
-              <ChevronRight className="w-5 h-5" />
-            ) : (
-              <ChevronLeft className="w-5 h-5" />
-            )}
-          </button>
-        </div>
 
-        <SidebarGroup className="px-4 py-6 relative">
-          <SidebarGroupLabel className={`text-white/60 uppercase text-xs font-bold tracking-widest px-3 mb-4 transition-opacity duration-300 ${collapsed ? 'opacity-0' : 'opacity-100'}`}>
-            Navigation
-          </SidebarGroupLabel>
+          {/* Navigation */}
+          <div className="flex-1 py-4">
+            <SidebarGroup>
+              <SidebarGroupContent>
+                <SidebarMenu className="space-y-1">
+                  {menuItems.map((item) => (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton asChild>
+                        <NavLink 
+                          to={item.url} 
+                          end 
+                          className={({ isActive }) => 
+                            `flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors duration-200 ${
+                              isActive 
+                                ? 'bg-primary text-white' 
+                                : 'hover:bg-gray-100 text-foreground'
+                            }`
+                          }
+                        >
+                          <item.icon className="w-5 h-5" />
+                          {open && (
+                            <span className="font-medium text-sm">{item.title}</span>
+                          )}
+                        </NavLink>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          </div>
 
-          <SidebarGroupContent>
-            <SidebarMenu className="space-y-2">
-              {menuItems.map((item, index) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink 
-                      to={item.url} 
-                      end={item.url === "/officer-dashboard"}
-                      className={({ isActive }) => getNavCls({ isActive })}
-                      style={{ animationDelay: `${index * 0.1}s` }}
-                    >
-                      <div className="relative">
-                        <item.icon className="w-6 h-6 flex-shrink-0 transition-all duration-300 drop-shadow-sm" />
-                        {isActive(item.url) && (
-                          <div className="absolute -inset-1 bg-gradient-to-r from-civic/30 to-warning/30 rounded-lg blur animate-pulse" />
-                        )}
-                      </div>
-                      {!collapsed && (
-                        <span className="truncate ml-4 font-medium transition-all duration-300">
-                          {item.title}
-                        </span>
-                      )}
-                      {!collapsed && isActive(item.url) && (
-                        <div className="ml-auto">
-                          <div className="w-2 h-2 bg-civic rounded-full animate-pulse" />
-                        </div>
-                      )}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        {/* Logout Button */}
-        <div className="mt-auto p-4 border-t border-white/10 backdrop-blur-sm relative">
-          <SidebarMenuButton asChild>
+          {/* Logout Button */}
+          <div className="p-4 border-t border-gray-100">
             <button
               onClick={handleLogout}
-              className="group flex items-center w-full p-3 rounded-xl transition-all duration-300 text-white/80 hover:bg-gradient-to-r hover:from-danger/20 hover:to-danger/10 hover:text-white hover:backdrop-blur-sm hover:shadow-md border border-transparent hover:border-danger/20"
+              className="flex items-center space-x-3 w-full px-3 py-2 rounded-lg text-red-600 hover:bg-red-50 transition-colors duration-200"
             >
-              <LogOut className="w-6 h-6 flex-shrink-0 transition-all duration-300 group-hover:scale-110" />
-              {!collapsed && (
-                <span className="truncate ml-4 font-medium">Logout</span>
-              )}
+              <LogOut className="w-5 h-5" />
+              {open && <span className="font-medium text-sm">Logout</span>}
             </button>
-          </SidebarMenuButton>
+          </div>
         </div>
-
-        {/* Decorative elements */}
-        <div className="absolute top-20 right-4 w-32 h-32 bg-gradient-to-br from-civic/10 to-warning/10 rounded-full blur-2xl opacity-50" />
-        <div className="absolute bottom-20 left-4 w-24 h-24 bg-gradient-to-br from-success/10 to-primary/10 rounded-full blur-2xl opacity-30" />
       </SidebarContent>
     </Sidebar>
   );

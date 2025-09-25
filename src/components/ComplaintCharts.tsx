@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, PieChart, Pie, Cell, LineChart, Line, ResponsiveContainer, Area, AreaChart } from 'recharts';
 import { BarChart3, PieChart as PieChartIcon, TrendingUp } from 'lucide-react';
 
-const ComplaintCharts: React.FC = () => {
+const ComplaintCharts: React.FC = memo(() => {
   // Sample data for charts with earthy colors
   const categoryData = [
     { name: 'Roads', value: 156, color: 'hsl(var(--danger))', icon: '🛣️' },
@@ -181,6 +181,8 @@ const ComplaintCharts: React.FC = () => {
       </div>
     </div>
   );
-};
+});
+
+ComplaintCharts.displayName = 'ComplaintCharts';
 
 export default ComplaintCharts;

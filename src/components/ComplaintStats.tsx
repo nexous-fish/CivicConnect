@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, AlertTriangle, CheckCircle, Clock } from 'lucide-react';
 
@@ -11,7 +11,7 @@ interface ComplaintStatsProps {
   };
 }
 
-const ComplaintStats: React.FC<ComplaintStatsProps> = ({ stats }) => {
+const ComplaintStats: React.FC<ComplaintStatsProps> = memo(({ stats }) => {
   const cards = [
     {
       title: "Total Complaints",
@@ -79,6 +79,8 @@ const ComplaintStats: React.FC<ComplaintStatsProps> = ({ stats }) => {
       ))}
     </div>
   );
-};
+});
+
+ComplaintStats.displayName = 'ComplaintStats';
 
 export default ComplaintStats;
