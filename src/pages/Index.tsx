@@ -46,7 +46,11 @@ const Index = () => {
                 <p className="text-sm text-muted-foreground">Municipal Complaint Portal</p>
               </div>
             </div>
-            <Button variant="civic-outline" size="sm">
+            <Button 
+              variant="civic-outline" 
+              size="sm"
+              onClick={() => window.location.href = '/officer-auth'}
+            >
               Officer Login
             </Button>
           </div>
