@@ -8,7 +8,23 @@ import IndiaMap from "@/components/IndiaMap";
 import ComplaintWizard from "@/components/ComplaintWizard";
 import StatsCard from "@/components/StatsCard";
 import CivicIssuesSlider from "@/components/CivicIssuesSlider";
-import CivicAnimatedCard from "@/components/ui/animated-card-unified";
+import CivicAnimatedCard from "@/components/CivicAnimatedCard";
+import { 
+  AnimatedCard, 
+  CardBody as AnimatedCardBody, 
+  CardDescription as AnimatedCardDescription, 
+  CardTitle as AnimatedCardTitle, 
+  CardVisual, 
+  Visual1 
+} from "@/components/ui/animated-card";
+import { 
+  AnimatedCard as AnimatedChartCard, 
+  CardBody as ChartCardBody, 
+  CardDescription as ChartCardDescription, 
+  CardTitle as ChartCardTitle, 
+  CardVisual as ChartCardVisual, 
+  Visual3 
+} from "@/components/ui/animated-card-chart";
 
 const Index = () => {
   const [showWizard, setShowWizard] = useState(false);
@@ -159,22 +175,45 @@ const Index = () => {
               description="Real-time complaint resolution tracking with interactive visualization"
               mainColor="#0ea5e9"
               secondaryColor="#10b981"
-              visualType="donut"
             />
             <CivicAnimatedCard
-              title="Monthly Complaint Trends"
-              description="Track complaint patterns and resolution rates across different cities and categories"
-              mainColor="#22c55e"
-              secondaryColor="#3b82f6"
-              visualType="line"
+              title="Priority Issues Monitor"
+              description="Critical infrastructure issues requiring immediate attention"
+              mainColor="#ef4444"
+              secondaryColor="#f59e0b"
             />
             <CivicAnimatedCard
-              title="Weekly Resolution Analytics"
-              description="Interactive chart showing complaint resolution rates with 15.2% improvement in response time"
+              title="Community Impact Score"
+              description="Measuring the positive changes in your local community"
               mainColor="#8b5cf6"
               secondaryColor="#ec4899"
-              visualType="bar"
             />
+            <AnimatedCard>
+              <CardVisual>
+                <Visual1 mainColor="#22c55e" secondaryColor="#3b82f6" />
+              </CardVisual>
+              <AnimatedCardBody>
+                <AnimatedCardTitle>Monthly Complaint Trends</AnimatedCardTitle>
+                <AnimatedCardDescription>
+                  Track complaint patterns and resolution rates across different cities and categories
+                </AnimatedCardDescription>
+              </AnimatedCardBody>
+            </AnimatedCard>
+          </div>
+
+          {/* Additional Animated Chart Cards */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 justify-items-center">
+            <AnimatedChartCard>
+              <ChartCardVisual>
+                <Visual3 mainColor="#0ea5e9" secondaryColor="#10b981" />
+              </ChartCardVisual>
+              <ChartCardBody>
+                <ChartCardTitle>Weekly Resolution Analytics</ChartCardTitle>
+                <ChartCardDescription>
+                  Interactive chart showing complaint resolution rates with 15.2% improvement in response time
+                </ChartCardDescription>
+              </ChartCardBody>
+            </AnimatedChartCard>
           </div>
 
           {/* India Map */}
