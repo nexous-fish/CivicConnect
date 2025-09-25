@@ -7,7 +7,7 @@ import { AlertTriangle, MapPin, Phone, Clock, TrendingUp } from 'lucide-react';
 import IndiaMap from "@/components/IndiaMap";
 import ComplaintWizard from "@/components/ComplaintWizard";
 import StatsCard from "@/components/StatsCard";
-import heroImage from "@/assets/civic-hero.jpg";
+import CivicIssuesSlider from "@/components/CivicIssuesSlider";
 
 const Index = () => {
   const [showWizard, setShowWizard] = useState(false);
@@ -101,11 +101,7 @@ const Index = () => {
             </div>
 
             <div className="relative">
-              <img 
-                src={heroImage} 
-                alt="Civic platform illustration"
-                className="rounded-2xl shadow-2xl w-full h-auto"
-              />
+              <CivicIssuesSlider />
             </div>
           </div>
         </div>
