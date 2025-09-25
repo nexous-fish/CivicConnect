@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { OfficerSidebar } from "@/components/OfficerSidebar";
 import ComplaintStats from "@/components/ComplaintStats";
 import ComplaintCharts from "@/components/ComplaintCharts";
@@ -120,14 +120,17 @@ const OfficerDashboard: React.FC = () => {
         
         <main className="flex-1 overflow-auto">
           {/* Header */}
-          <header className="bg-white/80 backdrop-blur-sm border-b border-border px-6 py-6 sticky top-0 z-10">
+          <header className="bg-white/80 backdrop-blur-sm border-b border-border px-6 py-6 sticky top-0 z-5">
             <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <h1 className="text-3xl font-bold text-foreground tracking-tight">Dashboard Overview</h1>
-                <p className="text-muted-foreground flex items-center gap-2">
-                  <span className="inline-block w-2 h-2 bg-success rounded-full animate-pulse"></span>
-                  Welcome back, {officerData?.name || 'Officer'}
-                </p>
+              <div className="flex items-center space-x-4">
+                <SidebarTrigger className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200" />
+                <div className="space-y-1">
+                  <h1 className="text-3xl font-bold text-foreground tracking-tight">Dashboard Overview</h1>
+                  <p className="text-muted-foreground flex items-center gap-2">
+                    <span className="inline-block w-2 h-2 bg-success rounded-full animate-pulse"></span>
+                    Welcome back, {officerData?.name || 'Officer'}
+                  </p>
+                </div>
               </div>
               
               <div className="flex items-center gap-4">
