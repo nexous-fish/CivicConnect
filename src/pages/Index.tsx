@@ -176,18 +176,6 @@ const Index = () => {
               mainColor="#0ea5e9"
               secondaryColor="#10b981"
             />
-            <CivicAnimatedCard
-              title="Priority Issues Monitor"
-              description="Critical infrastructure issues requiring immediate attention"
-              mainColor="#ef4444"
-              secondaryColor="#f59e0b"
-            />
-            <CivicAnimatedCard
-              title="Community Impact Score"
-              description="Measuring the positive changes in your local community"
-              mainColor="#8b5cf6"
-              secondaryColor="#ec4899"
-            />
             <AnimatedCard>
               <CardVisual>
                 <Visual1 mainColor="#22c55e" secondaryColor="#3b82f6" />
