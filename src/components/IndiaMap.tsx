@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
+import indiaMapImage from "@/assets/india-map.png";
 
 interface CityData {
   id: string;
@@ -41,25 +42,23 @@ const IndiaMap: React.FC = () => {
 
   return (
     <div className="relative w-full h-[500px] bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl overflow-hidden">
-      {/* Map Background with India Outline */}
+      {/* Map Background Image */}
       <div className="absolute inset-0 flex items-center justify-center">
+        <img 
+          src={indiaMapImage} 
+          alt="India Map with Complaint Markers"
+          className="w-full h-full object-contain"
+          onMouseMove={handleMouseMove}
+        />
+        
+        {/* Interactive City Markers Overlay */}
         <svg
           viewBox="0 0 400 300"
-          className="w-full h-full"
-          onMouseMove={handleMouseMove}
+          className="absolute inset-0 w-full h-full pointer-events-none"
         >
-          {/* Simplified India Map Outline */}
-          <path
-            d="M80 80 L120 60 L160 50 L200 55 L240 70 L280 80 L300 100 L320 130 L315 160 L300 190 L280 220 L250 240 L200 250 L150 245 L100 230 L80 200 L70 170 L75 140 L80 110 Z"
-            fill="rgba(59, 130, 246, 0.1)"
-            stroke="rgba(59, 130, 246, 0.3)"
-            strokeWidth="2"
-            className="transition-all duration-300"
-          />
-          
           {/* City Markers */}
           {mockCityData.map((city) => (
-            <g key={city.id}>
+            <g key={city.id} className="pointer-events-auto">
               <circle
                 cx={city.x * 4} // Scale to SVG coordinates
                 cy={city.y * 3}
@@ -72,7 +71,7 @@ const IndiaMap: React.FC = () => {
                 x={city.x * 4}
                 y={city.y * 3 + 20}
                 textAnchor="middle"
-                className="text-xs font-medium fill-foreground"
+                className="text-xs font-medium fill-foreground pointer-events-none"
               >
                 {city.name}
               </text>
