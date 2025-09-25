@@ -43,9 +43,10 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   ];
 
   const categories = [
-    { value: 'roads', label: '🕳️ Roads (Potholes, Broken roads)', icon: '🕳️' },
-    { value: 'sewage', label: '💧 Sewage (Leakages, Drainage issues)', icon: '💧' },
-    { value: 'sanitation', label: '🧹 Sanitation (Garbage, Filth)', icon: '🧹' }
+    { value: 'roads', label: 'Roads (Potholes, Broken roads)', icon: '🕳️' },
+    { value: 'sewage', label: 'Sewage (Leakages, Drainage issues)', icon: '💧' },
+    { value: 'sanitation', label: 'Sanitation (Garbage, Filth)', icon: '🧹' },
+    { value: 'other', label: 'Other', icon: '📝' }
   ];
 
   const handleNext = () => {
