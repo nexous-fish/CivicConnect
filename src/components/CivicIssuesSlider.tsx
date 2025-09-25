@@ -6,6 +6,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import Autoplay from "embla-carousel-autoplay";
 import roadIssues from "@/assets/road-issues.png";
 import sewageIssues from "@/assets/sewage-issues.png";
 import garbageIssues from "@/assets/garbage-issues.png";
@@ -37,7 +38,15 @@ const slides: SlideData[] = [
 const CivicIssuesSlider = () => {
   return (
     <div className="relative">
-      <Carousel className="w-full" opts={{ align: "start", loop: true }}>
+      <Carousel 
+        className="w-full" 
+        opts={{ align: "start", loop: true }}
+        plugins={[
+          Autoplay({
+            delay: 3000,
+          }),
+        ]}
+      >
         <CarouselContent>
           {slides.map((slide, index) => (
             <CarouselItem key={index}>
