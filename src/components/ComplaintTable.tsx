@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   Table, 
@@ -12,216 +12,257 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { 
-  Search, 
-  Filter, 
-  Users, 
-  Calendar,
-  MapPin,
-  FileText,
-  Clock,
-  CheckCircle,
-  XCircle
-} from 'lucide-react';
-
-// Sample data - replace with real data from Supabase
-const sampleComplaints = [
-  {
-    id: 'CMP001',
-    category: 'roads',
-    location: 'Subhas Nagar, Durg, Chhattisgarh',
-    citizenName: 'Rajesh Kumar',
-    citizenPhone: '+91 98765 43210',
-    description: 'Large pothole on main road causing traffic issues',
-    status: 'pending',
-    createdAt: '2024-01-15',
-    daysPending: 5,
-    contractor: null,
-  },
-  {
-    id: 'CMP002',
-    category: 'sewage',
-    location: 'Central Avenue, Bhilai, Chhattisgarh',
-    citizenName: 'Priya Sharma',
-    citizenPhone: '+91 87654 32109',
-    description: 'Sewage overflow near residential area',
-    status: 'resolved',
-    createdAt: '2024-01-10',
-    daysPending: 0,
-    contractor: 'ABC Contractors',
-  },
-  {
-    id: 'CMP003',
-    category: 'sanitation',
-    location: 'Padmanapur, Durg, Chhattisgarh',
-    citizenName: 'Amit Patel',
-    citizenPhone: '+91 76543 21098',
-    description: 'Garbage not collected for 3 days',
-    status: 'delayed',
-    createdAt: '2024-01-08',
-    daysPending: 12,
-    contractor: 'City Clean Services',
-  },
-];
-
-const getStatusBadge = (status: string) => {
-  switch (status) {
-    case 'pending':
-      return <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">Pending</Badge>;
-    case 'resolved':
-      return <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Resolved</Badge>;
-    case 'delayed':
-      return <Badge className="bg-red-100 text-red-800 hover:bg-red-100">Delayed</Badge>;
-    default:
-      return <Badge variant="outline">{status}</Badge>;
-  }
-};
-
-const getCategoryIcon = (category: string) => {
-  switch (category) {
-    case 'roads':
-      return '🕳️';
-    case 'sewage':
-      return '💧';
-    case 'sanitation':
-      return '🧹';
-    default:
-      return '📝';
-  }
-};
+import { Eye, UserPlus, MapPin, Search, Filter, Phone, User } from 'lucide-react';
 
 const ComplaintTable: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
 
-  const filteredComplaints = sampleComplaints.filter(complaint => {
-    const matchesSearch = complaint.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         complaint.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         complaint.citizenName.toLowerCase().includes(searchTerm.toLowerCase());
+  // Sample complaint data with enhanced info
+  const complaints = [
+    {
+      id: 'CMP-001',
+      category: 'Roads',
+      categoryIcon: '🛣️',
+      location: 'Andheri West, Mumbai, Maharashtra',
+      citizen: 'Rahul Sharma',  
+      phone: '+91 98765 43210',
+      daysPending: 3,
+      status: 'pending',
+      contractor: 'ABC Infrastructure',
+      priority: 'medium'
+    },
+    {
+      id: 'CMP-002',
+      category: 'Sewage',
+      categoryIcon: '💧',
+      location: 'Connaught Place, Delhi, Delhi',
+      citizen: 'Priya Patel',
+      phone: '+91 87654 32109',
+      daysPending: 0,
+      status: 'resolved',
+      contractor: 'XYZ Contractors',
+      priority: 'high'
+    },
+    {
+      id: 'CMP-003',
+      category: 'Sanitation',
+      categoryIcon: '🧹',
+      location: 'Koramangala, Bangalore, Karnataka',
+      citizen: 'Arjun Kumar',
+      phone: '+91 76543 21098',
+      daysPending: 12,
+      status: 'delayed',
+      contractor: 'Clean City Corp',
+      priority: 'high'
+    },
+    {
+      id: 'CMP-004',
+      category: 'Other',
+      categoryIcon: '⚙️',
+      location: 'T. Nagar, Chennai, Tamil Nadu',
+      citizen: 'Meera Nair',
+      phone: '+91 65432 10987',
+      daysPending: 5,
+      status: 'pending',
+      contractor: 'Not Assigned',
+      priority: 'low'
+    },
+    {
+      id: 'CMP-005',
+      category: 'Roads',
+      categoryIcon: '🛣️',
+      location: 'Banjara Hills, Hyderabad, Telangana',
+      citizen: 'Vikram Singh',
+      phone: '+91 54321 09876',
+      daysPending: 1,
+      status: 'resolved',
+      contractor: 'Road Masters Ltd',
+      priority: 'medium'
+    }
+  ];
+
+  const getStatusBadge = (status: string) => {
+    const statusConfig = {
+      resolved: { 
+        className: "bg-success/10 text-success border-success/20 hover:bg-success/20", 
+        label: "Resolved" 
+      },
+      pending: { 
+        className: "bg-warning/10 text-warning border-warning/20 hover:bg-warning/20", 
+        label: "Pending" 
+      },
+      delayed: { 
+        className: "bg-danger/10 text-danger border-danger/20 hover:bg-danger/20", 
+        label: "Delayed" 
+      }
+    };
     
+    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
+    return (
+      <Badge className={`${config.className} font-medium`}>
+        {config.label}
+      </Badge>
+    );
+  };
+
+  const filteredComplaints = complaints.filter(complaint => {
+    const matchesSearch = complaint.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         complaint.citizen.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         complaint.location.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || complaint.status === statusFilter;
     const matchesCategory = categoryFilter === 'all' || complaint.category === categoryFilter;
-
+    
     return matchesSearch && matchesStatus && matchesCategory;
   });
 
   return (
-    <Card className="shadow-sm border-0">
-      <CardHeader>
-        <CardTitle className="text-xl font-semibold text-slate-800 flex items-center">
-          <FileText className="w-6 h-6 mr-2 text-blue-600" />
-          Complaint Management
-        </CardTitle>
-        
-        {/* Filters */}
-        <div className="flex flex-col sm:flex-row gap-4 mt-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
-            <Input
-              placeholder="Search by ID, location, or citizen name..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
+    <Card className="w-full border-0 shadow-lg bg-gradient-to-br from-white to-muted/10">
+      <CardHeader className="pb-4">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <CardTitle className="text-xl font-semibold flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-primary/10">
+              <MapPin className="h-5 w-5 text-primary" />
+            </div>
+            Recent Complaints Management
+          </CardTitle>
+          
+          {/* Filter Bar */}
+          <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search complaints..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 w-full sm:w-64 h-10 border-border/50 focus:border-primary"
+              />
+            </div>
+            
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-full sm:w-32 h-10 border-border/50">
+                <Filter className="h-4 w-4 mr-2" />
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="resolved">Resolved</SelectItem>
+                <SelectItem value="delayed">Delayed</SelectItem>
+              </SelectContent>
+            </Select>
+            
+            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+              <SelectTrigger className="w-full sm:w-32 h-10 border-border/50">
+                <SelectValue placeholder="Category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                <SelectItem value="Roads">🛣️ Roads</SelectItem>
+                <SelectItem value="Sewage">💧 Sewage</SelectItem>
+                <SelectItem value="Sanitation">🧹 Sanitation</SelectItem>
+                <SelectItem value="Other">⚙️ Other</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-full sm:w-40">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="resolved">Resolved</SelectItem>
-              <SelectItem value="delayed">Delayed</SelectItem>
-            </SelectContent>
-          </Select>
-          
-          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger className="w-full sm:w-40">
-              <SelectValue placeholder="Category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
-              <SelectItem value="roads">Roads</SelectItem>
-              <SelectItem value="sewage">Sewage</SelectItem>
-              <SelectItem value="sanitation">Sanitation</SelectItem>
-              <SelectItem value="other">Other</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
       </CardHeader>
-
+      
       <CardContent>
-        <div className="rounded-lg border overflow-hidden">
+        <div className="rounded-lg border border-border/50 overflow-hidden">
           <Table>
-            <TableHeader className="bg-slate-50">
-              <TableRow>
-                <TableHead className="font-semibold text-slate-700">ID</TableHead>
-                <TableHead className="font-semibold text-slate-700">Category</TableHead>
-                <TableHead className="font-semibold text-slate-700">Location</TableHead>
-                <TableHead className="font-semibold text-slate-700">Citizen</TableHead>
-                <TableHead className="font-semibold text-slate-700">Status</TableHead>
-                <TableHead className="font-semibold text-slate-700">Days</TableHead>
-                <TableHead className="font-semibold text-slate-700">Contractor</TableHead>
-                <TableHead className="font-semibold text-slate-700">Actions</TableHead>
+            <TableHeader>
+              <TableRow className="bg-muted/30 border-b border-border/50 hover:bg-muted/30">
+                <TableHead className="font-semibold text-foreground">ID</TableHead>
+                <TableHead className="font-semibold text-foreground">Category</TableHead>
+                <TableHead className="font-semibold text-foreground">Location</TableHead>
+                <TableHead className="font-semibold text-foreground">Citizen Info</TableHead>
+                <TableHead className="font-semibold text-foreground">Duration</TableHead>
+                <TableHead className="font-semibold text-foreground">Status</TableHead>
+                <TableHead className="font-semibold text-foreground">Contractor</TableHead>
+                <TableHead className="font-semibold text-foreground text-center">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredComplaints.map((complaint) => (
-                <TableRow key={complaint.id} className="hover:bg-slate-50 transition-colors">
-                  <TableCell className="font-medium text-blue-600">
+              {filteredComplaints.map((complaint, index) => (
+                <TableRow 
+                  key={complaint.id} 
+                  className={`hover:bg-muted/20 transition-colors border-b border-border/30 ${
+                    index % 2 === 0 ? "bg-background" : "bg-muted/10"
+                  }`}
+                >
+                  <TableCell className="font-semibold text-primary">
                     {complaint.id}
                   </TableCell>
                   <TableCell>
-                    <div className="flex items-center space-x-2">
-                      <span className="text-lg">{getCategoryIcon(complaint.category)}</span>
-                      <span className="capitalize">{complaint.category}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">{complaint.categoryIcon}</span>
+                      <Badge variant="outline" className="text-xs font-medium border-border/50">
+                        {complaint.category}
+                      </Badge>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-sm text-muted-foreground max-w-48">
+                    <div className="truncate" title={complaint.location}>
+                      {complaint.location}
                     </div>
                   </TableCell>
                   <TableCell>
-                    <div className="flex items-center space-x-2">
-                      <MapPin className="w-4 h-4 text-slate-400" />
-                      <span className="text-sm text-slate-600">{complaint.location}</span>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-1 text-sm font-medium">
+                        <User className="h-3 w-3 text-muted-foreground" />
+                        {complaint.citizen}
+                      </div>
+                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                        <Phone className="h-3 w-3" />
+                        {complaint.phone}
+                      </div>
                     </div>
                   </TableCell>
                   <TableCell>
-                    <div>
-                      <div className="font-medium text-slate-900">{complaint.citizenName}</div>
-                      <div className="text-sm text-slate-500">{complaint.citizenPhone}</div>
-                    </div>
+                    <span className={`text-sm font-medium px-2 py-1 rounded-full ${
+                      complaint.daysPending > 7 ? 'bg-danger/10 text-danger' : 
+                      complaint.daysPending > 3 ? 'bg-warning/10 text-warning' : 
+                      complaint.daysPending === 0 ? 'bg-success/10 text-success' :
+                      'bg-muted/20 text-muted-foreground'
+                    }`}>
+                      {complaint.daysPending === 0 ? 'Completed' : `${complaint.daysPending} days`}
+                    </span>
                   </TableCell>
                   <TableCell>
                     {getStatusBadge(complaint.status)}
                   </TableCell>
-                  <TableCell>
-                    <div className="flex items-center space-x-1">
-                      <Clock className="w-4 h-4 text-slate-400" />
-                      <span className={`font-medium ${
-                        complaint.daysPending > 7 ? 'text-red-600' : 'text-slate-600'
-                      }`}>
-                        {complaint.daysPending}
+                  <TableCell className="text-sm">
+                    <div className={`flex items-center gap-2 ${
+                      complaint.contractor === 'Not Assigned' ? 'text-muted-foreground italic' : 'text-foreground'
+                    }`}>
+                      {complaint.contractor !== 'Not Assigned' && (
+                        <div className="w-6 h-6 bg-gradient-to-br from-primary to-civic rounded-full flex items-center justify-center text-white text-xs font-bold">
+                          {complaint.contractor.charAt(0)}
+                        </div>
+                      )}
+                      <span className="truncate max-w-32" title={complaint.contractor}>
+                        {complaint.contractor}
                       </span>
                     </div>
                   </TableCell>
                   <TableCell>
-                    {complaint.contractor ? (
-                      <div className="flex items-center space-x-1">
-                        <Users className="w-4 h-4 text-green-600" />
-                        <span className="text-sm text-slate-600">{complaint.contractor}</span>
-                      </div>
-                    ) : (
-                      <span className="text-slate-400 text-sm">Not assigned</span>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex space-x-2">
-                      <Button size="sm" variant="outline" className="text-blue-600 border-blue-200 hover:bg-blue-50">
+                    <div className="flex gap-2 justify-center">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="h-8 px-3 hover-lift border-border/50 hover:border-primary hover:text-primary"
+                      >
+                        <Eye className="h-3 w-3 mr-1" />
                         View
                       </Button>
-                      {complaint.status === 'pending' && (
-                        <Button size="sm" className="bg-yellow-600 hover:bg-yellow-700 text-white">
+                      {complaint.contractor === 'Not Assigned' && (
+                        <Button 
+                          size="sm" 
+                          className="h-8 px-3 hover-lift civic-gradient text-white hover:opacity-90"
+                        >
+                          <UserPlus className="h-3 w-3 mr-1" />
                           Assign
                         </Button>
                       )}
@@ -231,14 +272,14 @@ const ComplaintTable: React.FC = () => {
               ))}
             </TableBody>
           </Table>
+          
+          {filteredComplaints.length === 0 && (
+            <div className="p-8 text-center text-muted-foreground">
+              <div className="text-4xl mb-2">🔍</div>
+              <p>No complaints found matching your criteria.</p>
+            </div>
+          )}
         </div>
-
-        {filteredComplaints.length === 0 && (
-          <div className="text-center py-8">
-            <FileText className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-            <p className="text-slate-500">No complaints found matching your filters.</p>
-          </div>
-        )}
       </CardContent>
     </Card>
   );

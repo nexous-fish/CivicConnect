@@ -1,55 +1,6 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  FileText, 
-  CheckCircle, 
-  Clock, 
-  AlertTriangle,
-  TrendingUp,
-  Users,
-  Calendar
-} from 'lucide-react';
-
-interface StatsCardProps {
-  title: string;
-  value: number;
-  icon: React.ReactNode;
-  change?: string;
-  changeType?: 'positive' | 'negative' | 'neutral';
-  color: string;
-}
-
-const StatsCard: React.FC<StatsCardProps> = ({ 
-  title, 
-  value, 
-  icon, 
-  change, 
-  changeType = 'neutral',
-  color 
-}) => (
-  <Card className="hover:shadow-lg transition-shadow duration-200 border-0 shadow-sm">
-    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-      <CardTitle className="text-sm font-medium text-slate-600">{title}</CardTitle>
-      <div className={`p-2 rounded-lg ${color}`}>
-        {icon}
-      </div>
-    </CardHeader>
-    <CardContent>
-      <div className="text-3xl font-bold text-slate-900 mb-1">
-        {value.toLocaleString()}
-      </div>
-      {change && (
-        <p className={`text-xs flex items-center ${
-          changeType === 'positive' ? 'text-green-600' : 
-          changeType === 'negative' ? 'text-red-600' : 'text-slate-500'
-        }`}>
-          <TrendingUp className="w-3 h-3 mr-1" />
-          {change}
-        </p>
-      )}
-    </CardContent>
-  </Card>
-);
+import { TrendingUp, AlertTriangle, CheckCircle, Clock } from 'lucide-react';
 
 interface ComplaintStatsProps {
   stats: {
@@ -61,43 +12,71 @@ interface ComplaintStatsProps {
 }
 
 const ComplaintStats: React.FC<ComplaintStatsProps> = ({ stats }) => {
+  const cards = [
+    {
+      title: "Total Complaints",
+      value: stats.total,
+      description: "All time",
+      icon: TrendingUp,
+      color: "text-foreground",
+      bgGradient: "from-primary/5 to-primary/10",
+      iconColor: "text-primary"
+    },
+    {
+      title: "Resolved",
+      value: stats.resolved,
+      description: `${stats.total > 0 ? Math.round((stats.resolved / stats.total) * 100) : 0}% completion rate`,
+      icon: CheckCircle,
+      color: "text-success",
+      bgGradient: "from-success/5 to-success/10",
+      iconColor: "text-success"
+    },
+    {
+      title: "Pending",
+      value: stats.pending,
+      description: "Awaiting action",
+      icon: Clock,
+      color: "text-warning",
+      bgGradient: "from-warning/5 to-warning/10",
+      iconColor: "text-warning"
+    },
+    {
+      title: "Delayed",
+      value: stats.delayed,
+      description: "Over 7 days",
+      icon: AlertTriangle,
+      color: "text-danger",
+      bgGradient: "from-danger/5 to-danger/10",
+      iconColor: "text-danger"
+    }
+  ];
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      <StatsCard
-        title="Total Complaints"
-        value={stats.total}
-        icon={<FileText className="w-5 h-5 text-blue-600" />}
-        change="+12% from last month"
-        changeType="positive"
-        color="bg-blue-50"
-      />
-      
-      <StatsCard
-        title="Resolved"
-        value={stats.resolved}
-        icon={<CheckCircle className="w-5 h-5 text-green-600" />}
-        change="+8% resolution rate"
-        changeType="positive"
-        color="bg-green-50"
-      />
-      
-      <StatsCard
-        title="Pending"
-        value={stats.pending}
-        icon={<Clock className="w-5 h-5 text-yellow-600" />}
-        change="4% decrease"
-        changeType="positive"
-        color="bg-yellow-50"
-      />
-      
-      <StatsCard
-        title="Delayed"
-        value={stats.delayed}
-        icon={<AlertTriangle className="w-5 h-5 text-red-600" />}
-        change="2% increase"
-        changeType="negative"
-        color="bg-red-50"
-      />
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {cards.map((card, index) => (
+        <Card 
+          key={card.title}
+          className={`hover-lift border-0 shadow-lg bg-gradient-to-br ${card.bgGradient} backdrop-blur-sm hover:shadow-xl transition-all duration-300`}
+          style={{ animationDelay: `${index * 0.1}s` }}
+        >
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              {card.title}
+            </CardTitle>
+            <div className={`p-2 rounded-lg bg-white/80 ${card.iconColor}`}>
+              <card.icon className="h-4 w-4" />
+            </div>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className={`text-3xl font-bold ${card.color} mb-1`}>
+              {card.value.toLocaleString()}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {card.description}
+            </p>
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 };

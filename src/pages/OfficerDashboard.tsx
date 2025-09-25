@@ -113,36 +113,55 @@ const OfficerDashboard: React.FC = () => {
         
         <main className="flex-1 overflow-auto">
           {/* Header */}
-          <header className="bg-white border-b border-slate-200 px-6 py-4">
+          <header className="bg-white/80 backdrop-blur-sm border-b border-border px-6 py-6">
             <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-2xl font-bold text-slate-900">Dashboard Overview</h1>
-                <p className="text-slate-600">
+              <div className="space-y-1">
+                <h1 className="text-3xl font-bold text-foreground tracking-tight">Dashboard Overview</h1>
+                <p className="text-muted-foreground flex items-center gap-2">
+                  <span className="inline-block w-2 h-2 bg-success rounded-full animate-pulse"></span>
                   Welcome back, {officerData?.name || 'Officer'}
                 </p>
               </div>
               
-              <div className="text-sm text-slate-500">
-                Last updated: {new Date().toLocaleDateString('en-US', {
-                  weekday: 'long',
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                })}
+              <div className="flex items-center gap-4">
+                <div className="text-right">
+                  <div className="text-sm font-medium text-foreground">
+                    {new Date().toLocaleDateString('en-US', {
+                      weekday: 'long',
+                      month: 'short',
+                      day: 'numeric'
+                    })}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {new Date().toLocaleTimeString('en-US', {
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </div>
+                </div>
+                <div className="w-10 h-10 bg-gradient-to-br from-primary to-civic rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                  {(officerData?.name || 'O').charAt(0).toUpperCase()}
+                </div>
               </div>
             </div>
           </header>
 
           {/* Main Content */}
-          <div className="p-6 space-y-8">
+          <div className="p-6 space-y-8 bg-gradient-to-br from-background via-background to-muted/20 min-h-screen">
             {/* Stats Cards */}
-            <ComplaintStats stats={stats} />
+            <div className="animate-fade-in">
+              <ComplaintStats stats={stats} />
+            </div>
             
             {/* Charts */}
-            <ComplaintCharts />
+            <div className="animate-fade-in" style={{ animationDelay: '0.1s' }}>
+              <ComplaintCharts />
+            </div>
             
             {/* Complaint Table */}
-            <ComplaintTable />
+            <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
+              <ComplaintTable />
+            </div>
           </div>
         </main>
       </div>
