@@ -1,35 +1,17 @@
-// Update this page (the content is just a fallback if you fail to update the page)
-
-import React, { useState } from 'react';
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertTriangle, MapPin, Phone, Clock, TrendingUp } from 'lucide-react';
-import IndiaMap from "@/components/IndiaMap";
-import ComplaintWizard from "@/components/ComplaintWizard";
-import StatsCard from "@/components/StatsCard";
+import ComplaintFormWizard from "@/components/ComplaintFormWizard";
 import CivicIssuesSlider from "@/components/CivicIssuesSlider";
+import IndiaMap from "@/components/IndiaMap";
+import StatsCard from "@/components/StatsCard";
+import { Play, MessageCircle, Users, TrendingUp, Shield, UserCheck, MapPin, AlertTriangle, Phone, Clock } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
-  const [showWizard, setShowWizard] = useState(false);
-
-  if (showWizard) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-background to-muted/30 py-8">
-        <div className="container mx-auto px-4">
-          <div className="mb-8 text-center">
-            <Button 
-              variant="ghost" 
-              onClick={() => setShowWizard(false)}
-              className="mb-4"
-            >
-              ← Back to Dashboard
-            </Button>
-          </div>
-          <ComplaintWizard onClose={() => setShowWizard(false)} />
-        </div>
-      </div>
-    );
-  }
+  const [isComplaintFormOpen, setIsComplaintFormOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen hero-gradient">
@@ -46,7 +28,8 @@ const Index = () => {
                 <p className="text-sm text-muted-foreground">Municipal Complaint Portal</p>
               </div>
             </div>
-            <Button variant="civic-outline" size="sm">
+            <Button variant="outline" size="sm" onClick={() => navigate('/officer-auth')}>
+              <Shield className="w-4 h-4 mr-2" />
               Officer Login
             </Button>
           </div>
@@ -70,16 +53,15 @@ const Index = () => {
                 </p>
               </div>
               
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button 
-                  variant="hero" 
-                  onClick={() => setShowWizard(true)}
-                  className="w-full sm:w-auto"
-                >
-                  🚩 Report a Problem
+              <div className="flex gap-4">
+                <Button size="lg" className="civic-gradient text-white px-8 py-6 text-lg" onClick={() => setIsComplaintFormOpen(true)}>
+                  <MessageCircle className="mr-2 h-5 w-5" />
+                  Report a Problem
                 </Button>
-                <Button variant="civic-outline" className="w-full sm:w-auto">
-                  📊 View Analytics
+                
+                <Button size="lg" variant="outline" className="px-8 py-6 text-lg" onClick={() => navigate('/officer-auth')}>
+                  <UserCheck className="mr-2 h-5 w-5" />
+                  Officer Portal
                 </Button>
               </div>
 
@@ -174,13 +156,12 @@ const Index = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
-                variant="hero"
-                onClick={() => setShowWizard(true)}
-                className="bg-white text-civic hover:bg-white/90"
+                className="bg-white text-civic hover:bg-white/90 px-8 py-4"
+                onClick={() => setIsComplaintFormOpen(true)}
               >
                 🚩 Submit Your First Report
               </Button>
-              <Button variant="civic-outline" className="border-white text-white hover:bg-white hover:text-civic">
+              <Button variant="outline" className="border-white text-white hover:bg-white hover:text-civic px-8 py-4">
                 📱 Download Mobile App
               </Button>
             </div>
@@ -208,7 +189,7 @@ const Index = () => {
               <h4 className="font-semibold mb-4">Quick Links</h4>
               <ul className="space-y-2 text-muted-foreground">
                 <li><a href="#" className="hover:text-civic transition-colors">How it Works</a></li>
-                <li><a href="#" className="hover:text-civic transition-colors">Municipality Login</a></li>
+                <li><button onClick={() => navigate('/officer-auth')} className="hover:text-civic transition-colors">Municipality Login</button></li>
                 <li><a href="#" className="hover:text-civic transition-colors">Help & Support</a></li>
                 <li><a href="#" className="hover:text-civic transition-colors">Privacy Policy</a></li>
               </ul>
@@ -230,6 +211,13 @@ const Index = () => {
           </div>
         </div>
       </footer>
+
+      {/* Complaint Form Dialog */}
+      <Dialog open={isComplaintFormOpen} onOpenChange={setIsComplaintFormOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
+          <ComplaintFormWizard onClose={() => setIsComplaintFormOpen(false)} />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
