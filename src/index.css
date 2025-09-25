@@ -8,22 +8,22 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Civic Platform Design System */
-    --background: 220 15% 97%;
-    --foreground: 220 15% 15%;
+    /* Earthy & Citizen-Friendly Design System */
+    --background: 60 56% 98%;
+    --foreground: 122 30% 20%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 15% 15%;
+    --card-foreground: 122 30% 20%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 15% 15%;
+    --popover-foreground: 122 30% 20%;
 
-    /* Government Trust Blue */
-    --primary: 220 85% 35%;
+    /* Dark Green Primary */
+    --primary: 122 55% 24%;
     --primary-foreground: 0 0% 100%;
     
-    /* Civic Action Teal */
-    --civic-accent: 185 85% 45%;
+    /* Saffron Accent */
+    --civic-accent: 33 100% 50%;
     --civic-accent-foreground: 0 0% 100%;
 
     /* Complaint Status Colors */
@@ -31,26 +31,28 @@ All colors MUST be HSL.
     --success-foreground: 0 0% 100%;
     
     --warning: 45 95% 55%;
-    --warning-foreground: 220 15% 15%;
+    --warning-foreground: 122 30% 20%;
     
     --danger: 0 85% 55%;
     --danger-foreground: 0 0% 100%;
 
-    --secondary: 220 15% 95%;
-    --secondary-foreground: 220 15% 25%;
+    /* Sand/Beige Secondary */
+    --secondary: 60 56% 91%;
+    --secondary-foreground: 122 30% 20%;
 
-    --muted: 220 15% 94%;
-    --muted-foreground: 220 10% 45%;
+    --muted: 60 30% 88%;
+    --muted-foreground: 122 20% 45%;
 
-    --accent: 185 85% 45%;
+    /* Saffron Accent */
+    --accent: 33 100% 50%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 85% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 15% 88%;
-    --input: 220 15% 94%;
-    --ring: 185 85% 45%;
+    --border: 60 30% 85%;
+    --input: 60 56% 91%;
+    --ring: 33 100% 50%;
 
     --radius: 0.75rem;
     
@@ -59,7 +61,7 @@ All colors MUST be HSL.
     --gradient-heatmap-low: linear-gradient(135deg, hsl(var(--success)), hsl(140 60% 55%));
     --gradient-heatmap-medium: linear-gradient(135deg, hsl(var(--warning)), hsl(35 90% 60%));
     --gradient-heatmap-high: linear-gradient(135deg, hsl(var(--danger)), hsl(0 75% 65%));
-    --gradient-hero: linear-gradient(135deg, hsl(var(--background)), hsl(220 25% 92%));
+    --gradient-hero: linear-gradient(135deg, hsl(var(--background)), hsl(60 40% 94%));
     
     /* Shadows */
     --shadow-civic: 0 10px 30px -10px hsl(var(--primary) / 0.2);
