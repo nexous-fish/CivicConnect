@@ -9,6 +9,14 @@ import ComplaintWizard from "@/components/ComplaintWizard";
 import StatsCard from "@/components/StatsCard";
 import CivicIssuesSlider from "@/components/CivicIssuesSlider";
 import CivicAnimatedCard from "@/components/CivicAnimatedCard";
+import { 
+  AnimatedCard, 
+  CardBody as AnimatedCardBody, 
+  CardDescription as AnimatedCardDescription, 
+  CardTitle as AnimatedCardTitle, 
+  CardVisual, 
+  Visual1 
+} from "@/components/ui/animated-card";
 
 const Index = () => {
   const [showWizard, setShowWizard] = useState(false);
@@ -153,7 +161,7 @@ const Index = () => {
           </div>
 
           {/* Animated Cards Section */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 justify-items-center">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 justify-items-center">
             <CivicAnimatedCard
               title="Resolution Rate Analytics"
               description="Real-time complaint resolution tracking with interactive visualization"
@@ -172,6 +180,17 @@ const Index = () => {
               mainColor="#8b5cf6"
               secondaryColor="#ec4899"
             />
+            <AnimatedCard>
+              <CardVisual>
+                <Visual1 mainColor="#22c55e" secondaryColor="#3b82f6" />
+              </CardVisual>
+              <AnimatedCardBody>
+                <AnimatedCardTitle>Monthly Complaint Trends</AnimatedCardTitle>
+                <AnimatedCardDescription>
+                  Track complaint patterns and resolution rates across different cities and categories
+                </AnimatedCardDescription>
+              </AnimatedCardBody>
+            </AnimatedCard>
           </div>
 
           {/* India Map */}
