@@ -107,29 +107,10 @@ const IndiaMap: React.FC = () => {
       </video>
 
       {/* Map Background Image Overlay */}
-      <img 
-        src={indiaMapImage} 
-        alt="India Map" 
-        className="absolute inset-0 w-full h-full object-contain opacity-50 mix-blend-overlay"
-      />
+      
 
       {/* City Markers */}
-      {mockCityData.map(city => (
-        <div
-          key={city.id}
-          className={`absolute ${getMarkerClass(city.level)} cursor-pointer`}
-          style={{
-            left: `${city.x}%`,
-            top: `${city.y}%`,
-            transform: 'translate(-50%, -50%)'
-          }}
-          onMouseEnter={() => setHoveredCity(city)}
-          onMouseLeave={() => setHoveredCity(null)}
-          onMouseMove={handleMouseMove}
-        >
-          <div className="w-4 h-4 rounded-full border-2 border-white shadow-lg animate-pulse" />
-        </div>
-      ))}
+      {mockCityData.map(city => {})}
 
       {/* Tooltip */}
       {hoveredCity && <div className="fixed z-50 pointer-events-none" style={{
