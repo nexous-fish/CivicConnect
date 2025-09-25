@@ -72,7 +72,7 @@ const OfficerAuth: React.FC = () => {
         {/* Login Card */}
         <Card className="backdrop-blur-sm bg-white/95 shadow-2xl border-0">
           <CardHeader className="text-center pb-6">
-            <div className="mx-auto w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center mb-4">
+            <div className="mx-auto w-16 h-16 civic-gradient rounded-full flex items-center justify-center mb-4">
               <Shield className="w-8 h-8 text-white" />
             </div>
             <CardTitle className="text-2xl font-bold text-slate-800">
@@ -97,7 +97,7 @@ const OfficerAuth: React.FC = () => {
                     placeholder="officer@municipality.gov"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10 h-12 border-slate-200 focus:border-blue-500 focus:ring-blue-500"
+                    className="pl-10 h-12 border-slate-200 focus:border-primary focus:ring-primary"
                     required
                   />
                 </div>
@@ -115,7 +115,7 @@ const OfficerAuth: React.FC = () => {
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 h-12 border-slate-200 focus:border-blue-500 focus:ring-blue-500"
+                    className="pl-10 h-12 border-slate-200 focus:border-primary focus:ring-primary"
                     required
                   />
                 </div>
@@ -124,7 +124,7 @@ const OfficerAuth: React.FC = () => {
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200"
+                className="w-full h-12 civic-gradient hover:opacity-90 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200"
               >
                 {loading ? (
                   <div className="flex items-center space-x-2">
