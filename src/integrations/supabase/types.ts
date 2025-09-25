@@ -260,7 +260,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      complaint_category: "roads" | "sewage" | "sanitation"
+      complaint_category: "roads" | "sewage" | "sanitation" | "other"
       complaint_status:
         | "pending"
         | "assigned"
@@ -394,7 +394,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      complaint_category: ["roads", "sewage", "sanitation"],
+      complaint_category: ["roads", "sewage", "sanitation", "other"],
       complaint_status: [
         "pending",
         "assigned",
