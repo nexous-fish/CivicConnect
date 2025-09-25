@@ -118,9 +118,9 @@ const OfficerDashboard: React.FC = () => {
       <div className="min-h-screen flex w-full bg-gradient-to-br from-background via-background to-muted/20">
         <OfficerSidebar />
         
-        <main className="flex-1 overflow-auto">
+        <main className="flex-1 overflow-auto relative">
           {/* Header */}
-          <header className="bg-white/80 backdrop-blur-sm border-b border-border px-6 py-6 sticky top-0 z-5">
+          <header className="bg-white/80 backdrop-blur-sm border-b border-border px-6 py-6 sticky top-0 z-10">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <SidebarTrigger className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200" />

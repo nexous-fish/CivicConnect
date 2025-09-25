@@ -65,7 +65,7 @@ export function OfficerSidebar() {
       }`}
       collapsible="icon"
     >
-      <SidebarContent className="bg-white/95 backdrop-blur-md border-r border-gray-200 relative">
+      <SidebarContent className="bg-white/95 backdrop-blur-md border-r border-gray-200 h-full">
         <div className="h-full flex flex-col">
           {/* Header */}
           <div className="p-4 border-b border-gray-100">
