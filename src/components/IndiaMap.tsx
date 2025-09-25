@@ -11,24 +11,19 @@ interface CityData {
   level: 'low' | 'medium' | 'high';
 }
 
-const mockStateData: CityData[] = [
-  { id: '1', name: 'Maharashtra', complaints: 1234, topCategory: 'Roads', x: 18, y: 45, level: 'high' },
-  { id: '2', name: 'Delhi', complaints: 890, topCategory: 'Sanitation', x: 28, y: 25, level: 'high' },
-  { id: '3', name: 'Karnataka', complaints: 756, topCategory: 'Sewage', x: 25, y: 65, level: 'high' },
-  { id: '4', name: 'Tamil Nadu', complaints: 623, topCategory: 'Roads', x: 35, y: 70, level: 'medium' },
-  { id: '5', name: 'West Bengal', complaints: 498, topCategory: 'Sanitation', x: 45, y: 40, level: 'medium' },
-  { id: '6', name: 'Telangana', complaints: 387, topCategory: 'Sewage', x: 32, y: 58, level: 'medium' },
-  { id: '7', name: 'Gujarat', complaints: 276, topCategory: 'Roads', x: 15, y: 35, level: 'low' },
-  { id: '8', name: 'Rajasthan', complaints: 234, topCategory: 'Sanitation', x: 20, y: 30, level: 'low' },
-  { id: '9', name: 'Uttar Pradesh', complaints: 567, topCategory: 'Roads', x: 32, y: 28, level: 'medium' },
-  { id: '10', name: 'Madhya Pradesh', complaints: 345, topCategory: 'Sewage', x: 25, y: 38, level: 'medium' },
-  { id: '11', name: 'Chhattisgarh', complaints: 156, topCategory: 'Sanitation', x: 35, y: 42, level: 'low' },
-  { id: '12', name: 'Odisha', complaints: 234, topCategory: 'Roads', x: 42, y: 48, level: 'low' },
+const mockCityData: CityData[] = [
+  { id: '1', name: 'Mumbai', complaints: 234, topCategory: 'Roads', x: 18, y: 45, level: 'high' },
+  { id: '2', name: 'Delhi', complaints: 189, topCategory: 'Sanitation', x: 28, y: 25, level: 'high' },
+  { id: '3', name: 'Bangalore', complaints: 156, topCategory: 'Sewage', x: 25, y: 65, level: 'medium' },
+  { id: '4', name: 'Chennai', complaints: 123, topCategory: 'Roads', x: 35, y: 70, level: 'medium' },
+  { id: '5', name: 'Kolkata', complaints: 98, topCategory: 'Sanitation', x: 45, y: 40, level: 'medium' },
+  { id: '6', name: 'Hyderabad', complaints: 87, topCategory: 'Sewage', x: 32, y: 58, level: 'low' },
+  { id: '7', name: 'Pune', complaints: 76, topCategory: 'Roads', x: 22, y: 48, level: 'low' },
+  { id: '8', name: 'Ahmedabad', complaints: 65, topCategory: 'Sanitation', x: 15, y: 35, level: 'low' },
 ];
 
 const IndiaMap: React.FC = () => {
-  const [hoveredState, setHoveredState] = useState<CityData | null>(null);
-  const [selectedState, setSelectedState] = useState<CityData | null>(null);
+  const [hoveredCity, setHoveredCity] = useState<CityData | null>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   const handleMouseMove = (event: React.MouseEvent) => {
@@ -44,103 +39,42 @@ const IndiaMap: React.FC = () => {
     }
   };
 
-  const getMarkerCount = (complaints: number) => {
-    if (complaints >= 1000) return Math.floor(complaints / 100);
-    if (complaints >= 100) return Math.floor(complaints / 10);
-    return complaints;
-  };
-
   return (
-    <div className="relative w-full h-[600px] bg-gradient-to-br from-secondary/20 to-background rounded-2xl overflow-hidden">
-      {/* Map Background with Detailed India Outline */}
+    <div className="relative w-full h-[500px] bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl overflow-hidden">
+      {/* Map Background with India Outline */}
       <div className="absolute inset-0 flex items-center justify-center">
         <svg
-          viewBox="0 0 500 400"
+          viewBox="0 0 400 300"
           className="w-full h-full"
           onMouseMove={handleMouseMove}
         >
-          {/* Detailed India Map with States */}
-          <defs>
-            <linearGradient id="mapGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.1" />
-              <stop offset="100%" stopColor="hsl(var(--civic-accent))" stopOpacity="0.05" />
-            </linearGradient>
-          </defs>
-          
-          {/* Main India Outline */}
+          {/* Simplified India Map Outline */}
           <path
-            d="M 100 100 L 140 80 L 180 70 L 220 75 L 260 85 L 300 95 L 340 110 L 370 130 L 385 160 L 380 190 L 365 220 L 340 250 L 300 275 L 250 285 L 200 280 L 150 270 L 110 250 L 85 220 L 75 190 L 80 160 L 90 130 L 100 100 Z"
-            fill="url(#mapGradient)"
-            stroke="hsl(var(--primary))"
+            d="M80 80 L120 60 L160 50 L200 55 L240 70 L280 80 L300 100 L320 130 L315 160 L300 190 L280 220 L250 240 L200 250 L150 245 L100 230 L80 200 L70 170 L75 140 L80 110 Z"
+            fill="rgba(59, 130, 246, 0.1)"
+            stroke="rgba(59, 130, 246, 0.3)"
             strokeWidth="2"
-            className="map-state"
+            className="transition-all duration-300"
           />
           
-          {/* State Boundaries (Simplified) - Maharashtra */}
-          <path
-            d="M 150 170 L 180 160 L 200 180 L 185 200 L 160 195 Z"
-            fill="hsl(var(--primary))"
-            fillOpacity="0.1"
-            stroke="hsl(var(--primary))"
-            strokeWidth="1"
-            className="map-state"
-          />
-          
-          {/* State Boundaries - Karnataka */}
-          <path
-            d="M 160 200 L 190 195 L 205 220 L 180 225 L 165 210 Z"
-            fill="hsl(var(--primary))"
-            fillOpacity="0.1"
-            stroke="hsl(var(--primary))"
-            strokeWidth="1"
-            className="map-state"
-          />
-          
-          {/* State Boundaries - Gujarat */}
-          <path
-            d="M 120 130 L 150 125 L 160 150 L 140 155 L 125 145 Z"
-            fill="hsl(var(--primary))"
-            fillOpacity="0.1"
-            stroke="hsl(var(--primary))"
-            strokeWidth="1"
-            className="map-state"
-          />
-          
-          {/* State Markers */}
-          {mockStateData.map((state) => (
-            <g key={state.id}>
+          {/* City Markers */}
+          {mockCityData.map((city) => (
+            <g key={city.id}>
               <circle
-                cx={state.x * 5} // Scale to SVG coordinates
-                cy={state.y * 4}
-                r={12}
-                className={getMarkerClass(state.level)}
-                onMouseEnter={() => setHoveredState(state)}
-                onMouseLeave={() => setHoveredState(null)}
-                onClick={() => setSelectedState(selectedState?.id === state.id ? null : state)}
-              >
-                <animate
-                  attributeName="r"
-                  values="12;14;12"
-                  dur="2s"
-                  repeatCount="indefinite"
-                />
-              </circle>
+                cx={city.x * 4} // Scale to SVG coordinates
+                cy={city.y * 3}
+                r={8}
+                className={getMarkerClass(city.level)}
+                onMouseEnter={() => setHoveredCity(city)}
+                onMouseLeave={() => setHoveredCity(null)}
+              />
               <text
-                x={state.x * 5}
-                y={state.y * 4}
-                textAnchor="middle"
-                dominantBaseline="central"
-                className="text-xs font-bold fill-white pointer-events-none"
-              >
-                {getMarkerCount(state.complaints)}
-              </text>
-              <text
-                x={state.x * 5}
-                y={state.y * 4 + 25}
+                x={city.x * 4}
+                y={city.y * 3 + 20}
                 textAnchor="middle"
                 className="text-xs font-medium fill-foreground"
               >
-                {state.name}
+                {city.name}
               </text>
             </g>
           ))}
@@ -148,7 +82,7 @@ const IndiaMap: React.FC = () => {
       </div>
 
       {/* Tooltip */}
-      {hoveredState && (
+      {hoveredCity && (
         <div
           className="fixed z-50 pointer-events-none"
           style={{
@@ -156,60 +90,15 @@ const IndiaMap: React.FC = () => {
             top: mousePosition.y - 80,
           }}
         >
-          <Card className="card-shadow border-2 bg-white/95 backdrop-blur-sm">
-            <CardContent className="p-4">
-              <h3 className="font-bold text-lg text-primary mb-2">{hoveredState.name}</h3>
-              <div className="space-y-1">
-                <p className="text-sm font-semibold text-civic-accent">
-                  {hoveredState.complaints} Total Complaints
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  Most Common: {hoveredState.topCategory}
-                </p>
-                <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                  hoveredState.level === 'high' ? 'bg-danger/10 text-danger' :
-                  hoveredState.level === 'medium' ? 'bg-warning/10 text-warning' :
-                  'bg-success/10 text-success'
-                }`}>
-                  {hoveredState.level.toUpperCase()} Priority
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
-      {/* Selected State Details */}
-      {selectedState && (
-        <div className="absolute top-4 right-4 max-w-sm">
-          <Card className="card-shadow bg-white/95 backdrop-blur-sm">
-            <CardContent className="p-4">
-              <div className="flex items-start justify-between mb-3">
-                <h3 className="font-bold text-xl text-primary">{selectedState.name}</h3>
-                <button
-                  onClick={() => setSelectedState(null)}
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  ✕
-                </button>
-              </div>
-              <div className="space-y-3">
-                <div>
-                  <p className="text-2xl font-bold text-civic-accent">{selectedState.complaints}</p>
-                  <p className="text-sm text-muted-foreground">Total Complaints Filed</p>
-                </div>
-                <div>
-                  <p className="font-semibold text-primary">{selectedState.topCategory}</p>
-                  <p className="text-sm text-muted-foreground">Most Reported Issue</p>
-                </div>
-                <div className={`inline-flex items-center px-3 py-2 rounded-lg text-sm font-semibold ${
-                  selectedState.level === 'high' ? 'bg-danger/10 text-danger' :
-                  selectedState.level === 'medium' ? 'bg-warning/10 text-warning' :
-                  'bg-success/10 text-success'
-                }`}>
-                  {selectedState.level.toUpperCase()} Priority Region
-                </div>
-              </div>
+          <Card className="card-shadow border-2">
+            <CardContent className="p-3">
+              <h3 className="font-semibold text-sm">{hoveredCity.name}</h3>
+              <p className="text-xs text-muted-foreground">
+                {hoveredCity.complaints} complaints
+              </p>
+              <p className="text-xs font-medium">
+                Top: {hoveredCity.topCategory}
+              </p>
             </CardContent>
           </Card>
         </div>
