@@ -109,12 +109,7 @@ const IndiaMap: React.FC = () => {
       
 
       {/* City Markers */}
-      {mockCityData.map(city => <div key={city.id} className={getMarkerClass(city.level)} style={{
-      position: 'absolute',
-      left: `${city.x}%`,
-      top: `${city.y}%`,
-      transform: 'translate(-50%, -50%)'
-    }} onMouseEnter={() => setHoveredCity(city)} onMouseLeave={() => setHoveredCity(null)} onMouseMove={handleMouseMove} />)}
+      {mockCityData.map(city => {})}
 
       {/* Tooltip */}
       {hoveredCity && <div className="fixed z-50 pointer-events-none" style={{
