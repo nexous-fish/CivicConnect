@@ -15,6 +15,7 @@ interface ComplaintData {
   city_id: string;
   nagar_id: string;
   address: string;
+  name: string;
   phone: string;
   details: string;
   category: string;
@@ -45,6 +46,7 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     city_id: '',
     nagar_id: '',
     address: '',
+    name: '',
     phone: '',
     details: '',
     category: ''
@@ -148,12 +150,61 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     }
   };
 
-  const handleSubmit = () => {
-    // Simulate submission
-    setCurrentStep(6); // Show success screen
-    setTimeout(() => {
-      onClose();
-    }, 3000);
+  const handleSubmit = async () => {
+    try {
+      // Upload photo to Supabase storage if available
+      let photoUrl = null;
+      if (complaintData.photo) {
+        const fileExt = complaintData.photo.name.split('.').pop();
+        const fileName = `${Date.now()}.${fileExt}`;
+        
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('complaint-photos')
+          .upload(fileName, complaintData.photo);
+
+        if (uploadError) {
+          console.error('Upload error:', uploadError);
+        } else {
+          const { data: { publicUrl } } = supabase.storage
+            .from('complaint-photos')
+            .getPublicUrl(fileName);
+          photoUrl = publicUrl;
+        }
+      }
+
+      // Save complaint to database
+      const { data, error } = await supabase
+        .from('complaints')
+        .insert({
+          state_id: complaintData.state_id,
+          city_id: complaintData.city_id,
+          nagar_id: complaintData.nagar_id,
+          address: complaintData.address,
+          citizen_name: complaintData.name,
+          citizen_phone: complaintData.phone,
+          description: complaintData.details,
+          category: complaintData.category,
+          photo_url: photoUrl,
+          status: 'pending'
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Database error:', error);
+        alert('Failed to submit complaint. Please try again.');
+        return;
+      }
+
+      console.log('Complaint submitted successfully:', data);
+      setCurrentStep(6); // Show success screen
+      setTimeout(() => {
+        onClose();
+      }, 3000);
+    } catch (error) {
+      console.error('Submission error:', error);
+      alert('Failed to submit complaint. Please try again.');
+    }
   };
 
   const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -391,9 +442,20 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             </div>
           )}
 
-          {/* Step 4: Phone Number */}
+          {/* Step 4: Contact Details */}
           {currentStep === 4 && (
             <div className="space-y-4">
+              <div>
+                <Label htmlFor="name">Full Name</Label>
+                <Input
+                  id="name"
+                  type="text"
+                  placeholder="Enter your full name"
+                  value={complaintData.name}
+                  onChange={(e) => setComplaintData({ ...complaintData, name: e.target.value })}
+                />
+              </div>
+
               <div>
                 <Label htmlFor="phone">Phone Number</Label>
                 <Input
