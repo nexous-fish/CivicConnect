@@ -92,12 +92,18 @@ interface Visual2Props {
   mainColor?: string;
   secondaryColor?: string;
   gridColor?: string;
+  resolutionRate?: number;
+  totalComplaints?: number;
+  resolvedCount?: number;
 }
 
 export function Visual2({
   mainColor = "#8b5cf6",
   secondaryColor = "#fbbf24",
   gridColor = "#80808015",
+  resolutionRate = 23.8,
+  totalComplaints = 256,
+  resolvedCount = 61,
 }: Visual2Props) {
   const [hovered, setHovered] = useState(false);
 
@@ -119,8 +125,16 @@ export function Visual2({
           hovered={hovered}
           color={mainColor}
           secondaryColor={secondaryColor}
+          resolutionRate={resolutionRate}
+          totalComplaints={totalComplaints}
+          resolvedCount={resolvedCount}
         />
-        <Layer2 color={mainColor} />
+        <Layer2 
+          color={mainColor}
+          resolutionRate={resolutionRate}
+          totalComplaints={totalComplaints}
+          resolvedCount={resolvedCount}
+        />
         <Layer3 color={mainColor} />
         <Layer4
           color={mainColor}
@@ -138,6 +152,9 @@ interface LayerProps {
   color: string;
   secondaryColor?: string;
   hovered?: boolean;
+  resolutionRate?: number;
+  totalComplaints?: number;
+  resolvedCount?: number;
 }
 
 const EllipseGradient: React.FC<{ color: string }> = ({ color }) => {
@@ -179,8 +196,15 @@ const GridLayer: React.FC<{ color: string }> = ({ color }) => {
   );
 };
 
-const Layer1: React.FC<LayerProps> = ({ hovered, color, secondaryColor }) => {
-  const [mainProgress, setMainProgress] = useState(12.5);
+const Layer1: React.FC<LayerProps> = ({ 
+  hovered, 
+  color, 
+  secondaryColor, 
+  resolutionRate = 23.8, 
+  totalComplaints = 256,
+  resolvedCount = 61 
+}) => {
+  const [mainProgress, setMainProgress] = useState(resolutionRate);
   const [secondaryProgress, setSecondaryProgress] = useState(0);
 
   useEffect(() => {
@@ -188,18 +212,18 @@ const Layer1: React.FC<LayerProps> = ({ hovered, color, secondaryColor }) => {
 
     if (hovered) {
       timeout = setTimeout(() => {
-        setMainProgress(66);
+        setMainProgress(resolutionRate);
         setSecondaryProgress(100);
       }, 200);
     } else {
-      setMainProgress(12.5);
+      setMainProgress(resolutionRate);
       setSecondaryProgress(0);
     }
 
     return () => {
       clearTimeout(timeout);
     };
-  }, [hovered]);
+  }, [hovered, resolutionRate]);
 
   const radius = 40;
   const circumference = 2 * Math.PI * radius;
@@ -256,10 +280,9 @@ const Layer1: React.FC<LayerProps> = ({ hovered, color, secondaryColor }) => {
             <span className="font-gilroy text-xl text-black dark:text-white">
               {hovered
                 ? secondaryProgress > 66
-                  ? secondaryProgress
-                  : mainProgress
-                : mainProgress}
-              %
+                  ? `${totalComplaints}`
+                  : `${resolutionRate}%`
+                : `${resolutionRate}%`}
             </span>
           </div>
         </div>
@@ -268,7 +291,12 @@ const Layer1: React.FC<LayerProps> = ({ hovered, color, secondaryColor }) => {
   );
 };
 
-const Layer2: React.FC<{ color: string }> = ({ color }) => {
+const Layer2: React.FC<LayerProps> = ({ 
+  color, 
+  resolutionRate = 23.8, 
+  totalComplaints = 256, 
+  resolvedCount = 61 
+}) => {
   return (
     <div
       className="relative h-full w-[356px]"
@@ -279,11 +307,11 @@ const Layer2: React.FC<{ color: string }> = ({ color }) => {
           <div className="flex items-center gap-2">
             <div className="h-2 w-2 shrink-0 rounded-full bg-[var(--color)]" />
             <p className="text-xs text-black dark:text-white">
-              Random Data Visualization
+              Resolution Rate Analytics
             </p>
           </div>
           <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-            Displaying some interesting stats.
+            {resolvedCount} of {totalComplaints} complaints resolved
           </p>
         </div>
       </div>

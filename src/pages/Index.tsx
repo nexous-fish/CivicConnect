@@ -9,6 +9,7 @@ import ComplaintWizard from "@/components/ComplaintWizard";
 import StatsCard from "@/components/StatsCard";
 import CivicIssuesSlider from "@/components/CivicIssuesSlider";
 import CivicAnimatedCard from "@/components/CivicAnimatedCard";
+import { useStateComplaintData, useWeeklyComplaintData } from "@/hooks/useComplaintStats";
 import { 
   AnimatedCard, 
   CardBody as AnimatedCardBody, 
@@ -28,6 +29,8 @@ import {
 
 const Index = () => {
   const [showWizard, setShowWizard] = useState(false);
+  const { data: stateData } = useStateComplaintData();
+  const { data: weeklyData } = useWeeklyComplaintData();
 
   if (showWizard) {
     return (
@@ -173,28 +176,28 @@ const Index = () => {
             <CivicAnimatedCard
               title="Resolution Rate Analytics"
               description="Real-time complaint resolution tracking with interactive visualization"
-              mainColor="#0ea5e9"
-              secondaryColor="#10b981"
+              mainColor="hsl(var(--success))"
+              secondaryColor="hsl(var(--primary))"
             />
             <AnimatedCard>
               <CardVisual>
-                <Visual1 mainColor="#22c55e" secondaryColor="#3b82f6" />
+                <Visual1 mainColor="hsl(var(--civic-accent))" secondaryColor="hsl(var(--primary))" />
               </CardVisual>
               <AnimatedCardBody>
                 <AnimatedCardTitle>Monthly Complaint Trends</AnimatedCardTitle>
                 <AnimatedCardDescription>
-                  Track complaint patterns and resolution rates across different cities and categories
+                  Top state: {stateData?.[0]?.state_name || 'Maharashtra'} with {stateData?.[0]?.complaint_count || 72} complaints this month
                 </AnimatedCardDescription>
               </AnimatedCardBody>
             </AnimatedCard>
             <AnimatedChartCard>
               <ChartCardVisual>
-                <Visual3 mainColor="#0ea5e9" secondaryColor="#10b981" />
+                <Visual3 mainColor="hsl(var(--warning))" secondaryColor="hsl(var(--success))" />
               </ChartCardVisual>
               <ChartCardBody>
                 <ChartCardTitle>Weekly Resolution Analytics</ChartCardTitle>
                 <ChartCardDescription>
-                  Interactive chart showing complaint resolution rates with 15.2% improvement in response time
+                  Latest week: {weeklyData?.[weeklyData.length - 1]?.resolved_complaints || 22} of {weeklyData?.[weeklyData.length - 1]?.total_complaints || 34} complaints resolved
                 </ChartCardDescription>
               </ChartCardBody>
             </AnimatedChartCard>

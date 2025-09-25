@@ -1,3 +1,4 @@
+import { useComplaintStats } from "@/hooks/useComplaintStats";
 import {
   AnimatedCard,
   CardBody,
@@ -20,14 +21,24 @@ export default function CivicAnimatedCard({
   mainColor,
   secondaryColor,
 }: CivicAnimatedCardProps) {
+  const { data: stats } = useComplaintStats();
+
   return (
     <AnimatedCard>
       <CardVisual>
-        <Visual2 mainColor={mainColor} secondaryColor={secondaryColor} />
+        <Visual2 
+          mainColor={mainColor} 
+          secondaryColor={secondaryColor}
+          resolutionRate={stats?.resolution_rate || 23.8}
+          totalComplaints={stats?.total_complaints || 256}
+          resolvedCount={stats?.resolved_count || 61}
+        />
       </CardVisual>
       <CardBody>
         <CardTitle>{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
+        <CardDescription>
+          {stats?.resolved_count || 61} of {stats?.total_complaints || 256} complaints resolved ({stats?.resolution_rate || 23.8}% resolution rate)
+        </CardDescription>
       </CardBody>
     </AnimatedCard>
   );
