@@ -176,14 +176,13 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
       const { data, error } = await supabase
         .from('complaints')
         .insert({
-          state_id: complaintData.state_id,
           city_id: complaintData.city_id,
           nagar_id: complaintData.nagar_id,
           address: complaintData.address,
           citizen_name: complaintData.name,
           citizen_phone: complaintData.phone,
           description: complaintData.details,
-          category: complaintData.category,
+          category: complaintData.category as "roads" | "sewage" | "sanitation" | "other",
           photo_url: photoUrl,
           status: 'pending'
         })
