@@ -8,35 +8,66 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Civic Platform Design System */
+    --background: 220 15% 97%;
+    --foreground: 220 15% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 220 15% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 220 15% 15%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Government Trust Blue */
+    --primary: 220 85% 35%;
+    --primary-foreground: 0 0% 100%;
+    
+    /* Civic Action Teal */
+    --civic-accent: 185 85% 45%;
+    --civic-accent-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Complaint Status Colors */
+    --success: 140 70% 45%;
+    --success-foreground: 0 0% 100%;
+    
+    --warning: 45 95% 55%;
+    --warning-foreground: 220 15% 15%;
+    
+    --danger: 0 85% 55%;
+    --danger-foreground: 0 0% 100%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --secondary: 220 15% 95%;
+    --secondary-foreground: 220 15% 25%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --muted: 220 15% 94%;
+    --muted-foreground: 220 10% 45%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --accent: 185 85% 45%;
+    --accent-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --destructive: 0 85% 55%;
+    --destructive-foreground: 0 0% 100%;
 
-    --radius: 0.5rem;
+    --border: 220 15% 88%;
+    --input: 220 15% 94%;
+    --ring: 185 85% 45%;
+
+    --radius: 0.75rem;
+    
+    /* Gradients */
+    --gradient-civic: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--civic-accent)));
+    --gradient-heatmap-low: linear-gradient(135deg, hsl(var(--success)), hsl(140 60% 55%));
+    --gradient-heatmap-medium: linear-gradient(135deg, hsl(var(--warning)), hsl(35 90% 60%));
+    --gradient-heatmap-high: linear-gradient(135deg, hsl(var(--danger)), hsl(0 75% 65%));
+    --gradient-hero: linear-gradient(135deg, hsl(var(--background)), hsl(220 25% 92%));
+    
+    /* Shadows */
+    --shadow-civic: 0 10px 30px -10px hsl(var(--primary) / 0.2);
+    --shadow-card: 0 4px 20px -4px hsl(var(--primary) / 0.1);
+    --shadow-glow: 0 0 40px hsl(var(--civic-accent) / 0.3);
+    
+    /* Animations */
+    --transition-civic: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     --sidebar-background: 0 0% 98%;
 
@@ -100,6 +131,75 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+  }
+}
+
+@layer components {
+  /* Civic Design Utilities */
+  .civic-gradient {
+    background: var(--gradient-civic);
+  }
+  
+  .heatmap-low {
+    background: var(--gradient-heatmap-low);
+  }
+  
+  .heatmap-medium {
+    background: var(--gradient-heatmap-medium);  
+  }
+  
+  .heatmap-high {
+    background: var(--gradient-heatmap-high);
+  }
+  
+  .hero-gradient {
+    background: var(--gradient-hero);
+  }
+  
+  .civic-shadow {
+    box-shadow: var(--shadow-civic);
+  }
+  
+  .card-shadow {
+    box-shadow: var(--shadow-card);
+  }
+  
+  .glow-shadow {
+    box-shadow: var(--shadow-glow);
+  }
+  
+  .civic-transition {
+    transition: var(--transition-civic);
+  }
+  
+  /* Interactive Animations */
+  .hover-lift {
+    @apply transition-all duration-300 hover:translate-y-[-4px] hover:shadow-lg;
+  }
+  
+  .wizard-step {
+    @apply opacity-0 translate-x-8 transition-all duration-500;
+  }
+  
+  .wizard-step.active {
+    @apply opacity-100 translate-x-0;
+  }
+  
+  /* Map Styles */
+  .map-marker {
+    @apply w-4 h-4 rounded-full border-2 border-white shadow-md cursor-pointer transition-all duration-200;
+  }
+  
+  .map-marker.low {
+    @apply bg-success hover:scale-125;
+  }
+  
+  .map-marker.medium {
+    @apply bg-warning hover:scale-125;
+  }
+  
+  .map-marker.high {
+    @apply bg-destructive hover:scale-125;
   }
 }
