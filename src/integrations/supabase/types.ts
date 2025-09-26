@@ -46,8 +46,10 @@ export type Database = {
       complaints: {
         Row: {
           address: string | null
+          after_photo_url: string | null
           assigned_at: string | null
           assigned_contractor_id: string | null
+          before_photo_url: string | null
           category: Database["public"]["Enums"]["complaint_category"]
           citizen_name: string
           citizen_phone: string
@@ -66,8 +68,10 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          after_photo_url?: string | null
           assigned_at?: string | null
           assigned_contractor_id?: string | null
+          before_photo_url?: string | null
           category: Database["public"]["Enums"]["complaint_category"]
           citizen_name: string
           citizen_phone: string
@@ -86,8 +90,10 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          after_photo_url?: string | null
           assigned_at?: string | null
           assigned_contractor_id?: string | null
+          before_photo_url?: string | null
           category?: Database["public"]["Enums"]["complaint_category"]
           citizen_name?: string
           citizen_phone?: string

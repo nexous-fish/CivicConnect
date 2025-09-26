@@ -26,6 +26,10 @@ import {
   CardVisual as ChartCardVisual, 
   Visual3 
 } from "@/components/ui/animated-card-chart";
+import TopCitiesLeaderboard from "@/components/TopCitiesLeaderboard";
+import TrendingProblemsCloud from "@/components/TrendingProblemsCloud";
+import ResolvedHighlightsCarousel from "@/components/ResolvedHighlightsCarousel";
+import ReporterOfTheWeek from "@/components/ReporterOfTheWeek";
 
 const Index = () => {
   const [showWizard, setShowWizard] = useState(false);
@@ -169,6 +173,20 @@ const Index = () => {
               icon={TrendingUp}
               color="success"
             />
+          </div>
+
+          {/* New Data-driven Components */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <TopCitiesLeaderboard />
+            <TrendingProblemsCloud />
+            <div className="md:col-span-2">
+              <ResolvedHighlightsCarousel />
+            </div>
+          </div>
+
+          {/* Reporter of the Week */}
+          <div className="max-w-md mx-auto mb-8">
+            <ReporterOfTheWeek />
           </div>
 
           {/* Animated Cards Section */}
