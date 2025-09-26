@@ -163,7 +163,7 @@ const Index = () => {
             <div className="mb-6 text-center">
               <h3 className="text-2xl font-bold mb-2 flex items-center justify-center gap-2">
                 <MapPin className="w-6 h-6 text-civic" />
-                Interactive Earth Globe
+                Availability
               </h3>
               <p className="text-muted-foreground">Available in more than 30+ cities</p>
             </div>
