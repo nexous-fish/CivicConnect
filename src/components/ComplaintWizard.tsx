@@ -248,6 +248,57 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
       console.log('Complaint saved successfully:', complaintRecord);
 
+      // Send contractor assignment webhook if contractor is assigned
+      if (assignedContractorId) {
+        try {
+          // Get contractor details
+          const { data: contractorData, error: contractorFetchError } = await supabase
+            .from('contractors')
+            .select('*')
+            .eq('id', assignedContractorId)
+            .single();
+
+          if (!contractorFetchError && contractorData) {
+            const assignmentWebhookData = {
+              // Complaint details
+              complaint_id: complaintRecord.id,
+              complaint_number: complaintRecord.complaint_number,
+              citizen_name: complaintData.name,
+              citizen_phone: complaintData.phone,
+              category: complaintData.category,
+              description: complaintData.details,
+              address: complaintData.address,
+              photo_url: photoUrl || '',
+              status: complaintRecord.status,
+              created_at: complaintRecord.created_at,
+              assigned_at: complaintRecord.assigned_at,
+              // Contractor details
+              contractor_id: contractorData.id,
+              contractor_name: contractorData.name,
+              contractor_phone: contractorData.phone,
+              contractor_email: contractorData.email || ''
+            };
+
+            console.log('Sending contractor assignment webhook...', assignmentWebhookData);
+
+            const assignmentFormData = new FormData();
+            Object.entries(assignmentWebhookData).forEach(([key, value]) => {
+              assignmentFormData.append(key, String(value));
+            });
+
+            await fetch('https://mitulz.app.n8n.cloud/webhook/cf099891-51ee-49a9-9ef3-ee64b51d9778', {
+              method: 'POST',
+              body: assignmentFormData,
+              mode: 'no-cors'
+            });
+
+            console.log('Contractor assignment webhook sent successfully');
+          }
+        } catch (webhookError) {
+          console.error('Contractor assignment webhook error (non-critical):', webhookError);
+        }
+      }
+
       // Send webhook notification
       try {
         const webhookData = {
