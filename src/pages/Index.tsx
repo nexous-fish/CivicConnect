@@ -40,6 +40,19 @@ const Index = () => {
         </div>
       </div>;
   }
+
+  if (showAnalytics) {
+    return <div className="min-h-screen bg-gradient-to-br from-background to-muted/30">
+        <div className="container mx-auto px-4 py-8">
+          <div className="mb-8 text-center">
+            <Button variant="ghost" onClick={() => setShowAnalytics(false)} className="mb-4">
+              ← Back to Dashboard
+            </Button>
+          </div>
+          <AnalyticsSection />
+        </div>
+      </div>;
+  }
   return <div className="min-h-screen hero-gradient">
       {/* Header */}
       <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-40">
@@ -87,14 +100,7 @@ const Index = () => {
                 <Button variant="hero" onClick={() => setShowWizard(true)} className="w-full sm:w-auto">
                   🚩 Report a Problem
                 </Button>
-                <Button variant="civic-outline" className="w-full sm:w-auto" onClick={() => {
-                  setShowAnalytics(true);
-                  setTimeout(() => {
-                    document.getElementById('analytics-section')?.scrollIntoView({ 
-                      behavior: 'smooth' 
-                    });
-                  }, 100);
-                }}>
+                <Button variant="civic-outline" className="w-full sm:w-auto" onClick={() => setShowAnalytics(true)}>
                   📊 View Analytics
                 </Button>
               </div>
@@ -167,8 +173,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Analytics Section - Conditionally Rendered */}
-      {showAnalytics && <AnalyticsSection />}
 
       {/* Call to Action */}
       <section className="py-16 civic-gradient">
