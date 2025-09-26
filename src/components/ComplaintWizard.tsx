@@ -197,6 +197,25 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         description: "Please wait while we save your complaint.",
       });
 
+      // Find available contractor for the selected nagar
+      let assignedContractorId = null;
+      let complaintStatus = 'pending';
+      
+      try {
+        const { data: contractors, error: contractorError } = await supabase
+          .from('contractors')
+          .select('id, nagar_id')
+          .eq('nagar_id', complaintData.nagar_id)
+          .limit(1);
+
+        if (!contractorError && contractors && contractors.length > 0) {
+          assignedContractorId = contractors[0].id;
+          complaintStatus = 'in_progress';
+        }
+      } catch (contractorError) {
+        console.log('No contractor found for nagar, complaint will remain pending');
+      }
+
       // Save complaint to database
       const { data: complaintRecord, error } = await supabase
         .from('complaints')
@@ -209,7 +228,10 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           citizen_phone: complaintData.phone,
           description: complaintData.details,
           category: complaintData.category as any,
-          photo_url: photoUrl
+          photo_url: photoUrl,
+          assigned_contractor_id: assignedContractorId,
+          assigned_at: assignedContractorId ? new Date().toISOString() : null,
+          status: complaintStatus as any
         })
         .select('*, complaint_number')
         .single();
