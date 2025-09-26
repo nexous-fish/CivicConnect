@@ -203,18 +203,17 @@ const Index = () => {
             </AnimatedChartCard>
           </div>
 
-          {/* COBE Globe */}
-          <Card className="card-shadow">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <MapPin className="w-5 h-5 text-civic" />
+          {/* COBE Globe - Full Width */}
+          <div className="w-full">
+            <div className="mb-6 text-center">
+              <h3 className="text-2xl font-bold mb-2 flex items-center justify-center gap-2">
+                <MapPin className="w-6 h-6 text-civic" />
                 Interactive Earth Globe
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <GlobeDemo />
-            </CardContent>
-          </Card>
+              </h3>
+              <p className="text-muted-foreground">Explore cities worldwide with complaint data</p>
+            </div>
+            <GlobeDemo />
+          </div>
         </div>
       </section>
 
