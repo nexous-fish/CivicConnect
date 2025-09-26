@@ -147,26 +147,7 @@ const Layer1: React.FC<LayerProps> = ({
   const circumference = 2 * Math.PI * radius;
   const mainDashoffset = circumference - mainProgress / 100 * circumference;
   const secondaryDashoffset = circumference - secondaryProgress / 100 * circumference;
-  return <div className="ease-[cubic-bezier(0.6, 0.6, 0, 1)] absolute top-0 left-0 z-[7] flex h-[360px] w-[356px] transform items-center justify-center transition-transform duration-500 group-hover/animated-card:-translate-y-[90px] group-hover/animated-card:scale-110">
-      <div className="relative flex h-[120px] w-[120px] items-center justify-center text-[#00000050] dark:text-white">
-        <div className="donut-chart-container relative">
-          <svg width="120" height="120" viewBox="0 0 100 100">
-            <circle cx="50" cy="50" r={radius} stroke="currentColor" strokeWidth="10" fill="transparent" opacity={0.2} />
-            <circle cx="50" cy="50" r={radius} stroke={secondaryColor} strokeWidth="14" fill="transparent" strokeDasharray={circumference} strokeDashoffset={secondaryDashoffset} transform="rotate(-90 50 50)" style={{
-            transition: "stroke-dashoffset 0.5s cubic-bezier(0.6, 0.6, 0, 1)"
-          }} />
-            <circle cx="50" cy="50" r={radius} stroke={color} strokeWidth="14" fill="transparent" strokeDasharray={circumference} strokeDashoffset={mainDashoffset} transform="rotate(-90 50 50)" style={{
-            transition: "stroke-dashoffset 0.5s cubic-bezier(0.6, 0.6, 0, 1)"
-          }} />
-          </svg>
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span className="font-gilroy text-xl text-black dark:text-white">
-              {hovered ? secondaryProgress > 66 ? `${totalComplaints}` : `${resolutionRate}%` : `${resolutionRate}%`}
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>;
+  return null;
 };
 const Layer2: React.FC<LayerProps> = ({
   color,
