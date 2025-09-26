@@ -234,7 +234,7 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           category: complaintData.category,
           description: complaintData.details,
           address: complaintData.address,
-          photo_url: photoUrl,
+          photo_url: photoUrl || '',
           status: complaintRecord.status,
           created_at: complaintRecord.created_at,
           complaint_reference: `CMP${Date.now().toString().slice(-6)}`
@@ -242,13 +242,16 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
         console.log('Sending webhook notification...', webhookData);
 
+        // Send as form data for better webhook compatibility
+        const formData = new FormData();
+        Object.entries(webhookData).forEach(([key, value]) => {
+          formData.append(key, String(value));
+        });
+
         const webhookResponse = await fetch('https://mitulz.app.n8n.cloud/webhook/992930c7-973a-4357-8105-c6e3ca32faf9', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          mode: 'no-cors',
-          body: JSON.stringify(webhookData),
+          body: formData,
+          mode: 'no-cors'
         });
 
         console.log('Webhook sent successfully');
