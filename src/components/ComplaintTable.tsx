@@ -25,6 +25,7 @@ interface ComplaintTableProps {
 
 const ComplaintTable: React.FC<ComplaintTableProps> = ({ cityId, officerCityId }) => {
   const [searchTerm, setSearchTerm] = useState('');
+  console.log('Current searchTerm state:', searchTerm);
   const [statusFilter, setStatusFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [complaints, setComplaints] = useState<any[]>([]);
@@ -181,7 +182,10 @@ const ComplaintTable: React.FC<ComplaintTableProps> = ({ cityId, officerCityId }
               <Input
                 placeholder="Search complaints..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => {
+                  console.log('Input onChange triggered with value:', e.target.value);
+                  setSearchTerm(e.target.value);
+                }}
                 className="pl-10 w-full sm:w-64 h-10 border-border/50 focus:border-primary"
               />
             </div>
