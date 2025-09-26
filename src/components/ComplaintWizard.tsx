@@ -201,19 +201,22 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
       let assignedContractorId = null;
       let complaintStatus = 'pending';
       
-      try {
-        const { data: contractors, error: contractorError } = await supabase
-          .from('contractors')
-          .select('id, nagar_id')
-          .eq('nagar_id', complaintData.nagar_id)
-          .limit(1);
+      console.log('Looking for contractor for nagar_id:', complaintData.nagar_id);
+      
+      const { data: contractors, error: contractorError } = await supabase
+        .from('contractors')
+        .select('id, nagar_id, name')
+        .eq('nagar_id', complaintData.nagar_id)
+        .limit(1);
 
-        if (!contractorError && contractors && contractors.length > 0) {
-          assignedContractorId = contractors[0].id;
-          complaintStatus = 'in_progress';
-        }
-      } catch (contractorError) {
-        console.log('No contractor found for nagar, complaint will remain pending');
+      console.log('Contractor query result:', { contractors, contractorError });
+
+      if (!contractorError && contractors && contractors.length > 0) {
+        assignedContractorId = contractors[0].id;
+        complaintStatus = 'in_progress';
+        console.log('Contractor assigned:', { contractorId: assignedContractorId, contractorName: contractors[0].name });
+      } else {
+        console.log('No contractor found for nagar, complaint will remain pending. Error:', contractorError);
       }
 
       // Save complaint to database
@@ -250,6 +253,7 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
       // Send contractor assignment webhook if contractor is assigned
       if (assignedContractorId) {
+        console.log('🚀 Preparing to send contractor assignment webhook...');
         try {
           // Get contractor details
           const { data: contractorData, error: contractorFetchError } = await supabase
@@ -257,6 +261,8 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             .select('*')
             .eq('id', assignedContractorId)
             .single();
+
+          console.log('Contractor data for webhook:', { contractorData, contractorFetchError });
 
           if (!contractorFetchError && contractorData) {
             const assignmentWebhookData = {
@@ -279,24 +285,28 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
               contractor_email: contractorData.email || ''
             };
 
-            console.log('Sending contractor assignment webhook...', assignmentWebhookData);
+            console.log('📤 Sending contractor assignment webhook to n8n...', assignmentWebhookData);
 
             const assignmentFormData = new FormData();
             Object.entries(assignmentWebhookData).forEach(([key, value]) => {
               assignmentFormData.append(key, String(value));
             });
 
-            await fetch('https://mitulz.app.n8n.cloud/webhook/cf099891-51ee-49a9-9ef3-ee64b51d9778', {
+            const webhookResponse = await fetch('https://mitulz.app.n8n.cloud/webhook/cf099891-51ee-49a9-9ef3-ee64b51d9778', {
               method: 'POST',
               body: assignmentFormData,
               mode: 'no-cors'
             });
 
-            console.log('Contractor assignment webhook sent successfully');
+            console.log('✅ Contractor assignment webhook sent successfully to n8n!');
+          } else {
+            console.error('❌ Failed to get contractor data for webhook:', contractorFetchError);
           }
         } catch (webhookError) {
-          console.error('Contractor assignment webhook error (non-critical):', webhookError);
+          console.error('❌ Contractor assignment webhook error (non-critical):', webhookError);
         }
+      } else {
+        console.log('ℹ️ No contractor assigned, skipping contractor assignment webhook');
       }
 
       // Send webhook notification
