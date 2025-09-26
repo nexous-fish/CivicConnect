@@ -4,35 +4,55 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertTriangle, MapPin, Phone, Clock, TrendingUp } from 'lucide-react';
-import IndiaMap from "@/components/IndiaMap";
+import { GlobeDemo } from "@/components/GlobeDemo";
 import ComplaintWizard from "@/components/ComplaintWizard";
 import StatsCard from "@/components/StatsCard";
 import CivicIssuesSlider from "@/components/CivicIssuesSlider";
 import CivicAnimatedCard from "@/components/CivicAnimatedCard";
 import { useStateComplaintData, useWeeklyComplaintData } from "@/hooks/useComplaintStats";
-import { AnimatedCard, CardBody as AnimatedCardBody, CardDescription as AnimatedCardDescription, CardTitle as AnimatedCardTitle, CardVisual, Visual1 } from "@/components/ui/animated-card";
-import { AnimatedCard as AnimatedChartCard, CardBody as ChartCardBody, CardDescription as ChartCardDescription, CardTitle as ChartCardTitle, CardVisual as ChartCardVisual, Visual3 } from "@/components/ui/animated-card-chart";
+import { 
+  AnimatedCard, 
+  CardBody as AnimatedCardBody, 
+  CardDescription as AnimatedCardDescription, 
+  CardTitle as AnimatedCardTitle, 
+  CardVisual, 
+  Visual1 
+} from "@/components/ui/animated-card";
+import { 
+  AnimatedCard as AnimatedChartCard, 
+  CardBody as ChartCardBody, 
+  CardDescription as ChartCardDescription, 
+  CardTitle as ChartCardTitle, 
+  CardVisual as ChartCardVisual, 
+  Visual3 
+} from "@/components/ui/animated-card-chart";
+
 const Index = () => {
   const [showWizard, setShowWizard] = useState(false);
-  const {
-    data: stateData
-  } = useStateComplaintData();
-  const {
-    data: weeklyData
-  } = useWeeklyComplaintData();
+  const { data: stateData } = useStateComplaintData();
+  const { data: weeklyData } = useWeeklyComplaintData();
+
   if (showWizard) {
-    return <div className="min-h-screen bg-gradient-to-br from-background to-muted/30 py-8">
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background to-muted/30 py-8">
         <div className="container mx-auto px-4">
           <div className="mb-8 text-center">
-            <Button variant="ghost" onClick={() => setShowWizard(false)} className="mb-4">
+            <Button 
+              variant="ghost" 
+              onClick={() => setShowWizard(false)}
+              className="mb-4"
+            >
               ← Back to Dashboard
             </Button>
           </div>
           <ComplaintWizard onClose={() => setShowWizard(false)} />
         </div>
-      </div>;
+      </div>
+    );
   }
-  return <div className="min-h-screen hero-gradient">
+
+  return (
+    <div className="min-h-screen hero-gradient">
       {/* Header */}
       <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-40">
         <div className="container mx-auto px-4 py-4">
@@ -46,7 +66,11 @@ const Index = () => {
                 <p className="text-sm text-muted-foreground">Municipal Complaint Portal</p>
               </div>
             </div>
-            <Button variant="civic-outline" size="sm" onClick={() => window.location.href = '/officer-auth'}>
+            <Button 
+              variant="civic-outline" 
+              size="sm"
+              onClick={() => window.location.href = '/officer-auth'}
+            >
               Officer Login
             </Button>
           </div>
@@ -71,7 +95,11 @@ const Index = () => {
               </div>
               
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button variant="hero" onClick={() => setShowWizard(true)} className="w-full sm:w-auto">
+                <Button 
+                  variant="hero" 
+                  onClick={() => setShowWizard(true)}
+                  className="w-full sm:w-auto"
+                >
                   🚩 Report a Problem
                 </Button>
                 <Button variant="civic-outline" className="w-full sm:w-auto">
@@ -112,15 +140,45 @@ const Index = () => {
           </div>
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <StatsCard title="Total Complaints" value="1,234" description="+12% from last month" icon={AlertTriangle} trend="up" color="civic" />
-            <StatsCard title="Road Issues" value="456" description="Potholes & broken roads" icon={MapPin} color="danger" />
-            <StatsCard title="Sewage Problems" value="321" description="Drainage & leakages" icon={Phone} color="warning" />
-            <StatsCard title="Sanitation Issues" value="457" description="Garbage & cleanliness" icon={TrendingUp} color="success" />
+            <StatsCard
+              title="Total Complaints"
+              value="1,234"
+              description="+12% from last month"
+              icon={AlertTriangle}
+              trend="up"
+              color="civic"
+            />
+            <StatsCard
+              title="Road Issues"
+              value="456"
+              description="Potholes & broken roads"
+              icon={MapPin}
+              color="danger"
+            />
+            <StatsCard
+              title="Sewage Problems"
+              value="321"
+              description="Drainage & leakages"
+              icon={Phone}
+              color="warning"
+            />
+            <StatsCard
+              title="Sanitation Issues"
+              value="457"
+              description="Garbage & cleanliness"
+              icon={TrendingUp}
+              color="success"
+            />
           </div>
 
           {/* Animated Cards Section */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 justify-items-center">
-            <CivicAnimatedCard title="Resolution Rate Analytics" description="Real-time complaint resolution tracking with interactive visualization" mainColor="hsl(var(--success))" secondaryColor="hsl(var(--primary))" />
+            <CivicAnimatedCard
+              title="Resolution Rate Analytics"
+              description="Real-time complaint resolution tracking with interactive visualization"
+              mainColor="hsl(var(--success))"
+              secondaryColor="hsl(var(--primary))"
+            />
             <AnimatedCard>
               <CardVisual>
                 <Visual1 mainColor="hsl(var(--civic-accent))" secondaryColor="hsl(var(--primary))" />
@@ -145,15 +203,17 @@ const Index = () => {
             </AnimatedChartCard>
           </div>
 
-          {/* India Map */}
-          <Card className="card-shadow">
-            <CardHeader>
-              
-            </CardHeader>
-            <CardContent>
-              <IndiaMap />
-            </CardContent>
-          </Card>
+          {/* COBE Globe - Full Width */}
+          <div className="w-full">
+            <div className="mb-6 text-center">
+              <h3 className="text-2xl font-bold mb-2 flex items-center justify-center gap-2">
+                <MapPin className="w-6 h-6 text-civic" />
+                Interactive Earth Globe
+              </h3>
+              <p className="text-muted-foreground">Explore cities worldwide with complaint data</p>
+            </div>
+            <GlobeDemo />
+          </div>
         </div>
       </section>
 
@@ -168,7 +228,11 @@ const Index = () => {
               Every report counts. Help build cleaner, safer, and better-maintained communities for everyone.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button variant="hero" onClick={() => setShowWizard(true)} className="bg-white text-civic hover:bg-white/90">
+              <Button 
+                variant="hero"
+                onClick={() => setShowWizard(true)}
+                className="bg-white text-civic hover:bg-white/90"
+              >
                 🚩 Submit Your First Report
               </Button>
               <Button variant="civic-outline" className="border-white text-white hover:bg-white hover:text-civic">
@@ -221,6 +285,8 @@ const Index = () => {
           </div>
         </div>
       </footer>
-    </div>;
+    </div>
+  );
 };
+
 export default Index;
