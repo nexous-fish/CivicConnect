@@ -210,7 +210,7 @@ const Index = () => {
                 <MapPin className="w-6 h-6 text-civic" />
                 Interactive Earth Globe
               </h3>
-              <p className="text-muted-foreground">Explore cities worldwide with complaint data</p>
+              <p className="text-muted-foreground">Available in more than 30+ cities</p>
             </div>
             <GlobeDemo />
           </div>
