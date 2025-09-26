@@ -1,13 +1,20 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { OfficerSidebar } from "@/components/OfficerSidebar";
+import { NavBar } from "@/components/ui/tubelight-navbar";
 import ComplaintStats from "@/components/ComplaintStats";
 import ComplaintCharts from "@/components/ComplaintCharts";
 import ComplaintTable from "@/components/ComplaintTable";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { 
+  LayoutDashboard, 
+  FileText, 
+  Users, 
+  BarChart3, 
+  Settings,
+  LogOut 
+} from 'lucide-react';
 
 // Demo data for stable initial render
 const DEMO_STATS = {
@@ -16,6 +23,14 @@ const DEMO_STATS = {
   pending: 67,
   delayed: 16,
 };
+
+const navItems = [
+  { name: "Dashboard", url: "/officer-dashboard", icon: LayoutDashboard },
+  { name: "Complaints", url: "/officer-dashboard/complaints", icon: FileText },
+  { name: "Contractors", url: "/officer-dashboard/contractors", icon: Users },
+  { name: "Analytics", url: "/officer-dashboard/analytics", icon: BarChart3 },
+  { name: "Settings", url: "/officer-dashboard/settings", icon: Settings },
+];
 
 const OfficerDashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -102,6 +117,19 @@ const OfficerDashboard: React.FC = () => {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      toast({
+        title: "Logged out",
+        description: "You have been successfully logged out.",
+      });
+      navigate('/');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center">
@@ -114,74 +142,66 @@ const OfficerDashboard: React.FC = () => {
   }
 
   return (
-    <SidebarProvider defaultOpen={true}>
-      <div className="min-h-screen flex w-full bg-gradient-to-br from-background via-background to-muted/20">
-        <OfficerSidebar />
-        
-        <main className="flex-1 overflow-auto relative">
-          {/* Header */}
-          <header className="bg-white/80 backdrop-blur-sm border-b border-border px-6 py-6 sticky top-0 z-10">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <SidebarTrigger className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200" />
-                <div className="space-y-1">
-                  <h1 className="text-3xl font-bold text-foreground tracking-tight">Dashboard Overview</h1>
-                  <p className="text-muted-foreground flex items-center gap-2">
-                    <span className="inline-block w-2 h-2 bg-success rounded-full animate-pulse"></span>
-                    Welcome back, {officerData?.name || 'Officer'}
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-4">
-                <div className="text-right">
-                  <div className="text-sm font-medium text-foreground">
-                    {new Date().toLocaleDateString('en-US', {
-                      weekday: 'long',
-                      month: 'short',
-                      day: 'numeric'
-                    })}
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    {new Date().toLocaleTimeString('en-US', {
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}
-                  </div>
-                </div>
-                <div className="w-10 h-10 bg-gradient-to-br from-primary to-civic rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-lg">
-                  {(officerData?.name || 'O').charAt(0).toUpperCase()}
-                </div>
-              </div>
+    <div className="min-h-screen bg-gradient-to-br from-civic-light via-background to-primary-light/30">
+      <NavBar items={navItems} />
+      
+      <main className="pt-20 sm:pt-24 pb-20 sm:pb-6">
+        {/* Header */}
+        <div className="px-6 py-8 bg-white/80 backdrop-blur-sm border-b border-gray-200 mx-4 sm:mx-6 rounded-lg mb-6 mt-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">Officer Dashboard</h1>
+              <p className="text-sm text-muted-foreground flex items-center gap-2">
+                <span className="inline-block w-2 h-2 bg-success rounded-full animate-pulse"></span>
+                Welcome back, {officerData?.name || 'Officer'}
+              </p>
             </div>
-          </header>
-
-          {/* Main Content */}
-          <div className="p-6 space-y-8 bg-gradient-to-br from-background via-background to-muted/20 min-h-screen">
-            {/* Stats Cards */}
-            <ErrorBoundary>
-              <div className="transform translate-y-0 opacity-100 transition-all duration-300">
-                <ComplaintStats stats={stats} />
+            <div className="flex items-center gap-4">
+              <div className="text-right">
+                <div className="text-sm font-medium text-foreground">
+                  {new Date().toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    month: 'short',
+                    day: 'numeric'
+                  })}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {new Date().toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
+                </div>
               </div>
-            </ErrorBoundary>
-            
-            {/* Charts */}
-            <ErrorBoundary>
-              <div className="transform translate-y-0 opacity-100 transition-all duration-300" style={{ transitionDelay: '100ms' }}>
-                <ComplaintCharts />
+              <div className="w-10 h-10 bg-gradient-to-br from-primary to-civic rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-lg">
+                {(officerData?.name || 'O').charAt(0).toUpperCase()}
               </div>
-            </ErrorBoundary>
-            
-            {/* Complaint Table */}
-            <ErrorBoundary>
-              <div className="transform translate-y-0 opacity-100 transition-all duration-300" style={{ transitionDelay: '200ms' }}>
-                <ComplaintTable />
-              </div>
-            </ErrorBoundary>
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 px-3 py-2 rounded-lg text-red-600 hover:bg-red-50 transition-colors duration-200"
+              >
+                <LogOut className="w-4 h-4" />
+                <span className="hidden sm:inline text-sm">Logout</span>
+              </button>
+            </div>
           </div>
-        </main>
-      </div>
-    </SidebarProvider>
+        </div>
+
+        {/* Main Content */}
+        <div className="px-4 sm:px-6 space-y-8">
+          <ErrorBoundary>
+            <ComplaintStats stats={stats} />
+          </ErrorBoundary>
+          
+          <ErrorBoundary>
+            <ComplaintCharts />
+          </ErrorBoundary>
+          
+          <ErrorBoundary>
+            <ComplaintTable />
+          </ErrorBoundary>
+        </div>
+      </main>
+    </div>
   );
 };
 
