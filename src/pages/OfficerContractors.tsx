@@ -8,6 +8,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { LayoutDashboard, FileText, Users, BarChart3, Settings, Phone, Mail, MapPin } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import AddContractorDialog from "@/components/AddContractorDialog";
+import EditContractorDialog from "@/components/EditContractorDialog";
+import DeleteContractorDialog from "@/components/DeleteContractorDialog";
 
 const navItems = [
   { name: "Dashboard", url: "/officer-dashboard", icon: LayoutDashboard },
@@ -34,6 +36,9 @@ const OfficerContractors: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [officerData, setOfficerData] = useState<any>(null);
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [selectedContractor, setSelectedContractor] = useState<Contractor | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -75,6 +80,22 @@ const OfficerContractors: React.FC = () => {
       navigate('/officer-auth');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleEditContractor = (contractor: Contractor) => {
+    setSelectedContractor(contractor);
+    setShowEditDialog(true);
+  };
+
+  const handleDeleteContractor = (contractor: Contractor) => {
+    setSelectedContractor(contractor);
+    setShowDeleteDialog(true);
+  };
+
+  const handleDialogSuccess = () => {
+    if (officerData) {
+      fetchContractors(officerData.city_id);
     }
   };
 
@@ -171,8 +192,20 @@ const OfficerContractors: React.FC = () => {
                       {contractor.nagars?.name || 'Unknown Nagar'}
                     </div>
                     <div className="flex gap-2 pt-2">
-                      <Button variant="outline" size="sm">Edit</Button>
-                      <Button variant="destructive" size="sm">Remove</Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => handleEditContractor(contractor)}
+                      >
+                        Edit
+                      </Button>
+                      <Button 
+                        variant="destructive" 
+                        size="sm"
+                        onClick={() => handleDeleteContractor(contractor)}
+                      >
+                        Remove
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -192,12 +225,29 @@ const OfficerContractors: React.FC = () => {
 
       {/* Add Contractor Dialog */}
       {officerData && (
-        <AddContractorDialog
-          isOpen={showAddDialog}
-          onClose={() => setShowAddDialog(false)}
-          onSuccess={() => fetchContractors(officerData.city_id)}
-          officerCityId={officerData.city_id}
-        />
+        <>
+          <AddContractorDialog
+            isOpen={showAddDialog}
+            onClose={() => setShowAddDialog(false)}
+            onSuccess={handleDialogSuccess}
+            officerCityId={officerData.city_id}
+          />
+          
+          <EditContractorDialog
+            isOpen={showEditDialog}
+            onClose={() => setShowEditDialog(false)}
+            onSuccess={handleDialogSuccess}
+            contractor={selectedContractor}
+            officerCityId={officerData.city_id}
+          />
+          
+          <DeleteContractorDialog
+            isOpen={showDeleteDialog}
+            onClose={() => setShowDeleteDialog(false)}
+            onSuccess={handleDialogSuccess}
+            contractor={selectedContractor}
+          />
+        </>
       )}
     </div>
   );
