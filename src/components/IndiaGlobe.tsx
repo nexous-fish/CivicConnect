@@ -47,6 +47,7 @@ const IndiaGlobe: React.FC = () => {
           complaint_count
         }));
 
+        console.log('Fetched complaint data:', stateData);
         setComplaintData(stateData);
       } catch (error) {
         console.error('Error fetching complaint data:', error);
@@ -85,190 +86,95 @@ const IndiaGlobe: React.FC = () => {
   };
 
   useEffect(() => {
-    if (!mountRef.current || complaintData.length === 0) return;
+    console.log('Globe effect triggered, complaintData:', complaintData);
+    if (!mountRef.current) {
+      console.log('Mount ref not available');
+      return;
+    }
+
+    // Start with mock data if real data isn't loaded yet
+    const dataToUse = complaintData.length > 0 ? complaintData : [
+      { state_name: 'Maharashtra', complaint_count: 50 },
+      { state_name: 'Karnataka', complaint_count: 30 },
+      { state_name: 'Tamil Nadu', complaint_count: 25 }
+    ];
+    console.log('Using data:', dataToUse);
 
     const width = mountRef.current.clientWidth;
     const height = mountRef.current.clientHeight;
+    console.log('Container dimensions:', width, height);
 
-    // Scene setup
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    
-    renderer.setSize(width, height);
-    renderer.setClearColor(0x000000, 0);
-    mountRef.current.appendChild(renderer.domElement);
-
-    // Globe setup
-    const globe = new ThreeGlobe()
-      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
-      .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
-      .showGlobe(true)
-      .showAtmosphere(true)
-      .atmosphereColor('#87CEEB')
-      .atmosphereAltitude(0.1);
-
-    scene.add(globe);
-
-    // Load Indian states GeoJSON
-    fetch('/data/india-states-simple.geojson')
-      .then(response => response.json())
-      .then(geoData => {
-        // Add complaint data to features
-        geoData.features.forEach((feature: any) => {
-          const stateName = feature.properties.NAME_1 || feature.properties.name;
-          const stateData = complaintData.find(d => 
-            d.state_name.toLowerCase().includes(stateName.toLowerCase()) ||
-            stateName.toLowerCase().includes(d.state_name.toLowerCase())
-          );
-          
-          feature.properties.complaintCount = stateData?.complaint_count || 0;
-          feature.properties.color = getStateColor(feature.properties.complaintCount);
-        });
-
-        globe
-          .polygonsData(geoData.features)
-          .polygonCapColor((d: any) => d.properties.color || '#666')
-          .polygonSideColor(() => 'rgba(0, 0, 0, 0.1)')
-          .polygonStrokeColor(() => '#111')
-          .polygonAltitude(0.01);
-      })
-      .catch(error => {
-        console.error('Error loading GeoJSON:', error);
-      });
-
-    // Lighting
-    const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
-    scene.add(ambientLight);
-    
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-    directionalLight.position.set(1, 1, 1);
-    scene.add(directionalLight);
-
-    // Position camera
-    camera.position.z = 300;
-
-    // Mouse controls
-    let mouse = { x: 0, y: 0 };
-    let mouseOnDown = { x: 0, y: 0 };
-    let targetOnDown = { x: 0, y: 0 };
-    let target = { x: Math.PI * 3/2, y: Math.PI / 6.0 };
-    let targetOnDownPointer = { x: 0, y: 0 };
-    let isMouseDown = false;
-
-    const onMouseDown = (event: MouseEvent) => {
-      event.preventDefault();
-      isMouseDown = true;
-      isUserInteracting.current = true;
+    try {
+      // Scene setup
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
       
-      mouseOnDown.x = -event.clientX;
-      mouseOnDown.y = event.clientY;
-      targetOnDown.x = target.x;
-      targetOnDown.y = target.y;
-      
-      document.addEventListener('mousemove', onMouseMove);
-      document.addEventListener('mouseup', onMouseUp);
-    };
+      renderer.setSize(width, height);
+      renderer.setClearColor(0x000000, 0);
+      mountRef.current.appendChild(renderer.domElement);
+      console.log('Three.js scene created successfully');
 
-    const onMouseMove = (event: MouseEvent) => {
-      if (!isMouseDown) return;
-      
-      mouse.x = -event.clientX;
-      mouse.y = event.clientY;
-      
-      const zoomDamp = camera.position.z / 1000;
-      target.x = targetOnDown.x + (mouse.x - mouseOnDown.x) * 0.005 * zoomDamp;
-      target.y = targetOnDown.y + (mouse.y - mouseOnDown.y) * 0.005 * zoomDamp;
-      
-      target.y = target.y > Math.PI / 2 ? Math.PI / 2 : target.y;
-      target.y = target.y < -Math.PI / 2 ? -Math.PI / 2 : target.y;
-    };
+      // Globe setup
+      const globe = new ThreeGlobe()
+        .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
+        .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
+        .showGlobe(true)
+        .showAtmosphere(true)
+        .atmosphereColor('#87CEEB')
+        .atmosphereAltitude(0.1);
 
-    const onMouseUp = () => {
-      isMouseDown = false;
-      setTimeout(() => {
-        isUserInteracting.current = false;
-      }, 2000); // Resume auto-rotation after 2 seconds
-      
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup', onMouseUp);
-    };
+      scene.add(globe);
+      console.log('Globe created and added to scene');
 
-    const onMouseWheel = (event: WheelEvent) => {
-      event.preventDefault();
-      isUserInteracting.current = true;
+      // Lighting
+      const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+      scene.add(ambientLight);
       
-      const zoomSpeed = event.deltaY > 0 ? 1.1 : 0.9;
-      camera.position.z = Math.min(Math.max(camera.position.z * zoomSpeed, 150), 800);
-      
-      setTimeout(() => {
-        isUserInteracting.current = false;
-      }, 2000);
-    };
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+      directionalLight.position.set(1, 1, 1);
+      scene.add(directionalLight);
 
-    renderer.domElement.addEventListener('mousedown', onMouseDown);
-    renderer.domElement.addEventListener('wheel', onMouseWheel);
+      // Position camera
+      camera.position.z = 300;
 
-    // Animation loop
-    const animate = () => {
-      // Auto-rotation when not interacting
-      if (!isUserInteracting.current) {
-        target.x += autoRotateSpeed * 0.01;
-      }
-      
-      // Smooth camera movement
-      const rotationX = target.x;
-      const rotationY = target.y;
-      
-      camera.position.x = Math.cos(rotationY) * Math.cos(rotationX) * camera.position.z;
-      camera.position.y = Math.sin(rotationY) * camera.position.z;
-      camera.position.z = Math.cos(rotationY) * Math.sin(rotationX) * camera.position.z;
-      
-      camera.lookAt(scene.position);
-      
-      renderer.render(scene, camera);
-      animationRef.current = requestAnimationFrame(animate);
-    };
+      // Simple animation loop
+      let animationId: number;
+      const animate = () => {
+        // Simple auto rotation
+        globe.rotation.y += 0.005;
+        
+        renderer.render(scene, camera);
+        animationId = requestAnimationFrame(animate);
+      };
 
-    animate();
+      animate();
+      console.log('Animation started');
 
-    // Store refs
-    globeRef.current = globe;
-    rendererRef.current = renderer;
-    sceneRef.current = scene;
-    cameraRef.current = camera;
+      // Store refs
+      globeRef.current = globe;
+      rendererRef.current = renderer;
+      sceneRef.current = scene;
+      cameraRef.current = camera;
+      animationRef.current = animationId;
 
-    // Handle resize
-    const handleResize = () => {
-      if (!mountRef.current || !camera || !renderer) return;
-      
-      const newWidth = mountRef.current.clientWidth;
-      const newHeight = mountRef.current.clientHeight;
-      
-      camera.aspect = newWidth / newHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(newWidth, newHeight);
-    };
-
-    window.addEventListener('resize', handleResize);
-
-    // Cleanup
-    return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
-      
-      window.removeEventListener('resize', handleResize);
-      renderer.domElement.removeEventListener('mousedown', onMouseDown);
-      renderer.domElement.removeEventListener('wheel', onMouseWheel);
-      
-      if (mountRef.current && renderer.domElement) {
-        mountRef.current.removeChild(renderer.domElement);
-      }
-      
-      renderer.dispose();
-    };
-  }, [complaintData]);
+      // Cleanup
+      return () => {
+        if (animationId) {
+          cancelAnimationFrame(animationId);
+        }
+        
+        if (mountRef.current && renderer.domElement) {
+          mountRef.current.removeChild(renderer.domElement);
+        }
+        
+        renderer.dispose();
+        console.log('Cleanup completed');
+      };
+    } catch (error) {
+      console.error('Error setting up globe:', error);
+    }
+  }, [mountRef.current]); // Simplified dependency
 
   const maxComplaints = Math.max(...complaintData.map(d => d.complaint_count), 1);
 
@@ -299,7 +205,7 @@ const IndiaGlobe: React.FC = () => {
       </div>
 
       {/* Loading overlay */}
-      {complaintData.length === 0 && (
+      {!globeRef.current && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm">
           <div className="text-white text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-2"></div>
