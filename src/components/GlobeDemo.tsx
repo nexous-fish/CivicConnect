@@ -1,6 +1,6 @@
 import { Globe } from "@/components/ui/globe";
 export function GlobeDemo() {
-  return <div className="relative flex size-full max-w-xl items-center justify-center overflow-hidden rounded-lg border bg-background px-40 pb-40 pt-8 md:pb-60 md:shadow-xl mx-auto">
+  return <div className="relative flex size-full max-w-2xl items-center justify-center overflow-hidden rounded-lg border bg-background px-40 pb-40 pt-8 md:pb-60 md:shadow-xl mx-auto">
       <span className="pointer-events-none whitespace-pre-wrap bg-gradient-to-b from-black to-gray-300/80 bg-clip-text text-center text-8xl font-semibold leading-none text-transparent dark:from-white dark:to-slate-900/10">
         +30 Cities
       </span>
