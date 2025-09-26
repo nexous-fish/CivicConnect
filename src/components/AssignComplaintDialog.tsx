@@ -54,6 +54,16 @@ const AssignComplaintDialog: React.FC<AssignComplaintDialogProps> = ({
     }
   }, [isOpen, officerCityId]);
 
+  // Auto-select contractor based on complaint's nagar
+  useEffect(() => {
+    if (contractors.length > 0 && complaint?.nagar_id && !selectedContractor) {
+      const matchingContractor = contractors.find(c => c.nagar_id === complaint.nagar_id);
+      if (matchingContractor) {
+        setSelectedContractor(matchingContractor.id);
+      }
+    }
+  }, [contractors, complaint?.nagar_id, selectedContractor]);
+
   const fetchContractors = async () => {
     try {
       setFetchingContractors(true);
