@@ -171,6 +171,18 @@ const Index = () => {
             />
           </div>
 
+          {/* COBE Globe - Full Width */}
+          <div className="w-full">
+            <div className="mb-6 text-center">
+              <h3 className="text-2xl font-bold mb-2 flex items-center justify-center gap-2">
+                <MapPin className="w-6 h-6 text-civic" />
+                Interactive Earth Globe
+              </h3>
+              <p className="text-muted-foreground">Available in more than 30+ cities</p>
+            </div>
+            <GlobeDemo />
+          </div>
+
           {/* Animated Cards Section */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 justify-items-center">
             <CivicAnimatedCard
@@ -201,18 +213,6 @@ const Index = () => {
                 </ChartCardDescription>
               </ChartCardBody>
             </AnimatedChartCard>
-          </div>
-
-          {/* COBE Globe - Full Width */}
-          <div className="w-full">
-            <div className="mb-6 text-center">
-              <h3 className="text-2xl font-bold mb-2 flex items-center justify-center gap-2">
-                <MapPin className="w-6 h-6 text-civic" />
-                Interactive Earth Globe
-              </h3>
-              <p className="text-muted-foreground">Available in more than 30+ cities</p>
-            </div>
-            <GlobeDemo />
           </div>
         </div>
       </section>
