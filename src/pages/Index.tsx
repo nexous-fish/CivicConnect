@@ -148,15 +148,6 @@ const Index = () => {
                 </AnimatedCardDescription>
               </AnimatedCardBody>
             </AnimatedCard>
-            <AnimatedChartCard>
-              
-              <ChartCardBody>
-                
-                <ChartCardDescription>
-                  Latest week: {weeklyData?.[weeklyData.length - 1]?.resolved_complaints || 22} of {weeklyData?.[weeklyData.length - 1]?.total_complaints || 34} complaints resolved
-                </ChartCardDescription>
-              </ChartCardBody>
-            </AnimatedChartCard>
           </div>
 
           {/* COBE Globe - Full Width */}
