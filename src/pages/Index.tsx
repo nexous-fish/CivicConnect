@@ -16,6 +16,7 @@ import TopCitiesLeaderboard from "@/components/TopCitiesLeaderboard";
 import TrendingProblemsCloud from "@/components/TrendingProblemsCloud";
 import ResolvedHighlightsCarousel from "@/components/ResolvedHighlightsCarousel";
 import ReporterOfTheWeek from "@/components/ReporterOfTheWeek";
+import IndiaShowcaseSlider from "@/components/IndiaShowcaseSlider";
 const Index = () => {
   const [showWizard, setShowWizard] = useState(false);
   const {
@@ -172,6 +173,11 @@ const Index = () => {
               <p className="text-muted-foreground">Available in more than 30+ cities</p>
             </div>
             <GlobeDemo />
+          </div>
+
+          {/* India Showcase Slider */}
+          <div className="w-full mt-16">
+            <IndiaShowcaseSlider />
           </div>
         </div>
       </section>
