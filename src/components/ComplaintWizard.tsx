@@ -20,6 +20,7 @@ interface ComplaintData {
   phone: string;
   details: string;
   category: string;
+  complaint_reference?: string;
 }
 
 interface State {
@@ -210,7 +211,7 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           category: complaintData.category as any,
           photo_url: photoUrl
         })
-        .select()
+        .select('*, complaint_number')
         .single();
 
       if (error) {
@@ -229,6 +230,7 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
       try {
         const webhookData = {
           id: complaintRecord.id,
+          complaint_number: complaintRecord.complaint_number,
           citizen_name: complaintData.name,
           citizen_phone: complaintData.phone,
           category: complaintData.category,
@@ -236,8 +238,7 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           address: complaintData.address,
           photo_url: photoUrl || '',
           status: complaintRecord.status,
-          created_at: complaintRecord.created_at,
-          complaint_reference: `CMP${Date.now().toString().slice(-6)}`
+          created_at: complaintRecord.created_at
         };
 
         console.log('Sending webhook notification...', webhookData);
@@ -266,6 +267,13 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
       });
 
       setCurrentStep(6); // Show success screen
+      
+      // Store complaint number for success screen
+      setComplaintData(prev => ({ 
+        ...prev, 
+        complaint_reference: complaintRecord.complaint_number 
+      }));
+      
       setTimeout(() => {
         onClose();
       }, 3000);
@@ -305,7 +313,7 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           </p>
           <div className="bg-success/10 p-4 rounded-lg">
             <p className="text-sm text-success font-medium">
-              Reference ID: #CMP{Date.now().toString().slice(-6)}
+              Complaint Number: {complaintData.complaint_reference || 'Generating...'}
             </p>
           </div>
         </CardContent>
