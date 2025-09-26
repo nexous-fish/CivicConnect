@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertTriangle, MapPin, Phone, Clock, TrendingUp } from 'lucide-react';
-import IndiaMap from "@/components/IndiaMap";
+import IndiaGlobe from "@/components/IndiaGlobe";
 import ComplaintWizard from "@/components/ComplaintWizard";
 import StatsCard from "@/components/StatsCard";
 import CivicIssuesSlider from "@/components/CivicIssuesSlider";
@@ -203,16 +203,16 @@ const Index = () => {
             </AnimatedChartCard>
           </div>
 
-          {/* India Map */}
+          {/* India Globe */}
           <Card className="card-shadow">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <MapPin className="w-5 h-5 text-civic" />
-                India Complaint Heatmap
+                3D India Complaint Globe
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <IndiaMap />
+              <IndiaGlobe />
             </CardContent>
           </Card>
         </div>
