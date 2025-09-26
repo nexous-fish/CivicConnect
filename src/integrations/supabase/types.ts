@@ -54,6 +54,7 @@ export type Database = {
           citizen_name: string
           citizen_phone: string
           city_id: string
+          complaint_number: string | null
           created_at: string
           description: string
           id: string
@@ -76,6 +77,7 @@ export type Database = {
           citizen_name: string
           citizen_phone: string
           city_id: string
+          complaint_number?: string | null
           created_at?: string
           description: string
           id?: string
@@ -98,6 +100,7 @@ export type Database = {
           citizen_name?: string
           citizen_phone?: string
           city_id?: string
+          complaint_number?: string | null
           created_at?: string
           description?: string
           id?: string
@@ -290,7 +293,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_complaint_number: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
       complaint_category: "roads" | "sewage" | "sanitation" | "other"
