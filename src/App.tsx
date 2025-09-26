@@ -7,6 +7,10 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import OfficerAuth from "./pages/OfficerAuth";
 import OfficerDashboard from "./pages/OfficerDashboard";
+import OfficerComplaints from "./pages/OfficerComplaints";
+import OfficerContractors from "./pages/OfficerContractors";
+import OfficerAnalytics from "./pages/OfficerAnalytics";
+import OfficerSettings from "./pages/OfficerSettings";
 
 const queryClient = new QueryClient();
 
@@ -20,6 +24,10 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/officer-auth" element={<OfficerAuth />} />
           <Route path="/officer-dashboard" element={<OfficerDashboard />} />
+          <Route path="/officer-dashboard/complaints" element={<OfficerComplaints />} />
+          <Route path="/officer-dashboard/contractors" element={<OfficerContractors />} />
+          <Route path="/officer-dashboard/analytics" element={<OfficerAnalytics />} />
+          <Route path="/officer-dashboard/settings" element={<OfficerSettings />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
