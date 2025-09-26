@@ -145,22 +145,22 @@ const OfficerDashboard: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-civic-light via-background to-primary-light/30">
       <NavBar items={navItems} />
       
-      <main className="pt-20 sm:pt-24 pb-20 sm:pb-6">
+      <main className="pt-16 sm:pt-20 pb-20 sm:pb-6">
         {/* Header */}
-        <div className="px-6 py-8 bg-white/80 backdrop-blur-sm border-b border-gray-200 mx-4 sm:mx-6 rounded-lg mb-6 mt-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-foreground">Officer Dashboard</h1>
-              <p className="text-sm text-muted-foreground flex items-center gap-2">
+        <div className="px-4 sm:px-6 py-4 sm:py-6 bg-background/80 backdrop-blur-sm border border-border mx-2 sm:mx-4 rounded-xl mb-6 mt-2 sm:mt-4 shadow-card-shadow">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex-1">
+              <h1 className="text-xl sm:text-2xl font-bold text-foreground">Officer Dashboard</h1>
+              <p className="text-sm text-muted-foreground flex items-center gap-2 mt-1">
                 <span className="inline-block w-2 h-2 bg-success rounded-full animate-pulse"></span>
                 Welcome back, {officerData?.name || 'Officer'}
               </p>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="text-right">
+            <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto justify-between sm:justify-end">
+              <div className="text-left sm:text-right">
                 <div className="text-sm font-medium text-foreground">
                   {new Date().toLocaleDateString('en-US', {
-                    weekday: 'long',
+                    weekday: 'short',
                     month: 'short',
                     day: 'numeric'
                   })}
@@ -172,16 +172,18 @@ const OfficerDashboard: React.FC = () => {
                   })}
                 </div>
               </div>
-              <div className="w-10 h-10 bg-gradient-to-br from-primary to-civic rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-lg">
-                {(officerData?.name || 'O').charAt(0).toUpperCase()}
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-primary to-civic rounded-full flex items-center justify-center text-white font-semibold text-xs sm:text-sm shadow-lg">
+                  {(officerData?.name || 'O').charAt(0).toUpperCase()}
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-destructive hover:bg-destructive/10 transition-colors duration-200"
+                >
+                  <LogOut className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="text-xs sm:text-sm">Logout</span>
+                </button>
               </div>
-              <button
-                onClick={handleLogout}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg text-red-600 hover:bg-red-50 transition-colors duration-200"
-              >
-                <LogOut className="w-4 h-4" />
-                <span className="hidden sm:inline text-sm">Logout</span>
-              </button>
             </div>
           </div>
         </div>
