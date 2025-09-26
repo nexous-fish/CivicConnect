@@ -16,6 +16,7 @@ import TopCitiesLeaderboard from "@/components/TopCitiesLeaderboard";
 import TrendingProblemsCloud from "@/components/TrendingProblemsCloud";
 import ResolvedHighlightsCarousel from "@/components/ResolvedHighlightsCarousel";
 import ReporterOfTheWeek from "@/components/ReporterOfTheWeek";
+import IndiaShowcaseSlider from "@/components/IndiaShowcaseSlider";
 const Index = () => {
   const [showWizard, setShowWizard] = useState(false);
   const {
@@ -169,6 +170,13 @@ const Index = () => {
             </div>
             <GlobeDemo />
           </div>
+        </div>
+      </section>
+
+      {/* India Showcase Slider */}
+      <section className="py-12 bg-gradient-to-br from-background via-muted/20 to-background">
+        <div className="container mx-auto px-4">
+          <IndiaShowcaseSlider />
         </div>
       </section>
 
