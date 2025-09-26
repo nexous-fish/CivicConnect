@@ -17,8 +17,11 @@ import TrendingProblemsCloud from "@/components/TrendingProblemsCloud";
 import ResolvedHighlightsCarousel from "@/components/ResolvedHighlightsCarousel";
 import ReporterOfTheWeek from "@/components/ReporterOfTheWeek";
 import IndiaShowcaseSlider from "@/components/IndiaShowcaseSlider";
+import AnalyticsSection from "@/components/AnalyticsSection";
+
 const Index = () => {
   const [showWizard, setShowWizard] = useState(false);
+  const [showAnalytics, setShowAnalytics] = useState(false);
   const {
     data: stateData
   } = useStateComplaintData();
@@ -84,7 +87,14 @@ const Index = () => {
                 <Button variant="hero" onClick={() => setShowWizard(true)} className="w-full sm:w-auto">
                   🚩 Report a Problem
                 </Button>
-                <Button variant="civic-outline" className="w-full sm:w-auto">
+                <Button variant="civic-outline" className="w-full sm:w-auto" onClick={() => {
+                  setShowAnalytics(true);
+                  setTimeout(() => {
+                    document.getElementById('analytics-section')?.scrollIntoView({ 
+                      behavior: 'smooth' 
+                    });
+                  }, 100);
+                }}>
                   📊 View Analytics
                 </Button>
               </div>
@@ -156,6 +166,9 @@ const Index = () => {
           <IndiaShowcaseSlider />
         </div>
       </section>
+
+      {/* Analytics Section - Conditionally Rendered */}
+      {showAnalytics && <AnalyticsSection />}
 
       {/* Call to Action */}
       <section className="py-16 civic-gradient">
