@@ -78,6 +78,9 @@ export type Database = {
           complaint_number: string | null
           created_at: string
           description: string
+          feedback_received: boolean | null
+          feedback_star: string | null
+          feedback_text: string | null
           id: string
           latitude: number | null
           longitude: number | null
@@ -101,6 +104,9 @@ export type Database = {
           complaint_number?: string | null
           created_at?: string
           description: string
+          feedback_received?: boolean | null
+          feedback_star?: string | null
+          feedback_text?: string | null
           id?: string
           latitude?: number | null
           longitude?: number | null
@@ -124,6 +130,9 @@ export type Database = {
           complaint_number?: string | null
           created_at?: string
           description?: string
+          feedback_received?: boolean | null
+          feedback_star?: string | null
+          feedback_text?: string | null
           id?: string
           latitude?: number | null
           longitude?: number | null
@@ -314,6 +323,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      assign_contractor_to_complaint: {
+        Args: { p_complaint_id: string; p_nagar_id: string }
+        Returns: {
+          contractor_email: string
+          contractor_id: string
+          contractor_name: string
+          contractor_phone: string
+          success: boolean
+        }[]
+      }
       generate_complaint_number: {
         Args: Record<PropertyKey, never>
         Returns: string

@@ -197,29 +197,8 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         description: "Please wait while we save your complaint.",
       });
 
-      // Find available contractor for the selected nagar
-      let assignedContractorId = null;
-      let complaintStatus = 'pending';
-      
-      console.log('Looking for contractor for nagar_id:', complaintData.nagar_id);
-      
-      const { data: contractors, error: contractorError } = await supabase
-        .from('contractors')
-        .select('id, nagar_id, name')
-        .eq('nagar_id', complaintData.nagar_id)
-        .limit(1);
-
-      console.log('Contractor query result:', { contractors, contractorError });
-
-      if (!contractorError && contractors && contractors.length > 0) {
-        assignedContractorId = contractors[0].id;
-        complaintStatus = 'in_progress';
-        console.log('Contractor assigned:', { contractorId: assignedContractorId, contractorName: contractors[0].name });
-      } else {
-        console.log('No contractor found for nagar, complaint will remain pending. Error:', contractorError);
-      }
-
-      // Save complaint to database
+      // Save complaint to database first (without contractor assignment)
+      console.log('Saving complaint to database...');
       const { data: complaintRecord, error } = await supabase
         .from('complaints')
         .insert({
@@ -232,9 +211,7 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           description: complaintData.details,
           category: complaintData.category as any,
           photo_url: photoUrl,
-          assigned_contractor_id: assignedContractorId,
-          assigned_at: assignedContractorId ? new Date().toISOString() : null,
-          status: complaintStatus as any
+          status: 'pending' as any
         })
         .select('*, complaint_number')
         .single();
@@ -251,57 +228,74 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
       console.log('Complaint saved successfully:', complaintRecord);
 
-      // Send contractor assignment webhook if contractor is assigned
-      if (assignedContractorId) {
+      // Try to assign contractor using the security definer function
+      console.log('Attempting to assign contractor for nagar_id:', complaintData.nagar_id);
+      
+      let contractorAssignmentData = null;
+      try {
+        const { data: assignmentResult, error: assignmentError } = await supabase
+          .rpc('assign_contractor_to_complaint', {
+            p_complaint_id: complaintRecord.id,
+            p_nagar_id: complaintData.nagar_id
+          });
+
+        console.log('Contractor assignment result:', { assignmentResult, assignmentError });
+
+        if (!assignmentError && assignmentResult && assignmentResult.length > 0) {
+          const assignment = assignmentResult[0];
+          if (assignment.success) {
+            contractorAssignmentData = assignment;
+            console.log('✅ Contractor assigned successfully:', {
+              contractorId: assignment.contractor_id,
+              contractorName: assignment.contractor_name
+            });
+          } else {
+            console.log('ℹ️ No contractor available for this nagar');
+          }
+        }
+      } catch (assignmentError) {
+        console.error('❌ Contractor assignment error (non-critical):', assignmentError);
+      }
+
+      // Send contractor assignment webhook if contractor was assigned
+      if (contractorAssignmentData && contractorAssignmentData.success) {
         console.log('🚀 Preparing to send contractor assignment webhook...');
         try {
-          // Get contractor details
-          const { data: contractorData, error: contractorFetchError } = await supabase
-            .from('contractors')
-            .select('*')
-            .eq('id', assignedContractorId)
-            .single();
+          // Use contractor data already returned by the security definer function
+          const assignmentWebhookData = {
+            // Complaint details
+            complaint_id: complaintRecord.id,
+            complaint_number: complaintRecord.complaint_number,
+            citizen_name: complaintData.name,
+            citizen_phone: complaintData.phone,
+            category: complaintData.category,
+            description: complaintData.details,
+            address: complaintData.address,
+            photo_url: photoUrl || '',
+            status: 'in_progress', // Status was updated by the function
+            created_at: complaintRecord.created_at,
+            assigned_at: new Date().toISOString(),
+            // Contractor details from the function result
+            contractor_id: contractorAssignmentData.contractor_id,
+            contractor_name: contractorAssignmentData.contractor_name,
+            contractor_phone: contractorAssignmentData.contractor_phone,
+            contractor_email: contractorAssignmentData.contractor_email || ''
+          };
 
-          console.log('Contractor data for webhook:', { contractorData, contractorFetchError });
+          console.log('📤 Sending contractor assignment webhook to n8n...', assignmentWebhookData);
 
-          if (!contractorFetchError && contractorData) {
-            const assignmentWebhookData = {
-              // Complaint details
-              complaint_id: complaintRecord.id,
-              complaint_number: complaintRecord.complaint_number,
-              citizen_name: complaintData.name,
-              citizen_phone: complaintData.phone,
-              category: complaintData.category,
-              description: complaintData.details,
-              address: complaintData.address,
-              photo_url: photoUrl || '',
-              status: complaintRecord.status,
-              created_at: complaintRecord.created_at,
-              assigned_at: complaintRecord.assigned_at,
-              // Contractor details
-              contractor_id: contractorData.id,
-              contractor_name: contractorData.name,
-              contractor_phone: contractorData.phone,
-              contractor_email: contractorData.email || ''
-            };
+          const assignmentFormData = new FormData();
+          Object.entries(assignmentWebhookData).forEach(([key, value]) => {
+            assignmentFormData.append(key, String(value));
+          });
 
-            console.log('📤 Sending contractor assignment webhook to n8n...', assignmentWebhookData);
+          const webhookResponse = await fetch('https://mitulz.app.n8n.cloud/webhook/cf099891-51ee-49a9-9ef3-ee64b51d9778', {
+            method: 'POST',
+            body: assignmentFormData,
+            mode: 'no-cors'
+          });
 
-            const assignmentFormData = new FormData();
-            Object.entries(assignmentWebhookData).forEach(([key, value]) => {
-              assignmentFormData.append(key, String(value));
-            });
-
-            const webhookResponse = await fetch('https://mitulz.app.n8n.cloud/webhook/cf099891-51ee-49a9-9ef3-ee64b51d9778', {
-              method: 'POST',
-              body: assignmentFormData,
-              mode: 'no-cors'
-            });
-
-            console.log('✅ Contractor assignment webhook sent successfully to n8n!');
-          } else {
-            console.error('❌ Failed to get contractor data for webhook:', contractorFetchError);
-          }
+          console.log('✅ Contractor assignment webhook sent successfully to n8n!');
         } catch (webhookError) {
           console.error('❌ Contractor assignment webhook error (non-critical):', webhookError);
         }
