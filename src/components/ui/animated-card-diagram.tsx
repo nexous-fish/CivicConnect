@@ -245,16 +245,5 @@ const Layer4: React.FC<LayerProps> = ({
     translateY: "-50",
     text: "Stripe"
   }];
-  return <div className="ease-[cubic-bezier(0.6, 0.6, 0, 1)] absolute inset-0 z-[7] flex items-center justify-center opacity-0 transition-opacity duration-500 group-hover/animated-card:opacity-100">
-      {items.map((item, index) => <div key={item.id} className="ease-[cubic-bezier(0.6, 0.6, 0, 1)] absolute flex items-center justify-center gap-1 rounded-full border border-zinc-200 bg-white/70 px-1.5 py-0.5 backdrop-blur-sm transition-all duration-500 dark:border-zinc-800 dark:bg-black/70" style={{
-      transform: hovered ? `translate(${item.translateX}px, ${item.translateY}px)` : "translate(0px, 0px)"
-    }}>
-          <div className="h-1.5 w-1.5 rounded-full" style={{
-        backgroundColor: index < 3 ? color : secondaryColor
-      }} />
-          <span className="ml-1 text-[10px] text-black dark:text-white">
-            {item.text}
-          </span>
-        </div>)}
-    </div>;
+  return null;
 };
