@@ -73,7 +73,7 @@ const OfficerDashboard: React.FC = () => {
       setOfficerData(officer);
       
       // Fetch complaint statistics
-      await fetchComplaintStats();
+      await fetchComplaintStats(officer.city_id);
       
     } catch (error) {
       console.error('Auth check error:', error);
@@ -83,12 +83,18 @@ const OfficerDashboard: React.FC = () => {
     }
   };
 
-  const fetchComplaintStats = async () => {
+  const fetchComplaintStats = async (cityId?: string) => {
     try {
-      // Fetch all complaints
-      const { data: complaints, error } = await supabase
+      // Fetch complaints filtered by city if cityId is provided
+      const query = supabase
         .from('complaints')
         .select('status, created_at');
+      
+      if (cityId) {
+        query.eq('city_id', cityId);
+      }
+
+      const { data: complaints, error } = await query;
 
       if (error || !complaints || complaints.length === 0) {
         // Keep demo data, don't update if fetch fails
@@ -199,7 +205,7 @@ const OfficerDashboard: React.FC = () => {
           </ErrorBoundary>
           
           <ErrorBoundary>
-            <ComplaintTable />
+            <ComplaintTable cityId={officerData?.city_id} />
           </ErrorBoundary>
         </div>
       </main>

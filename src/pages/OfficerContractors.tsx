@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { NavBar } from "@/components/ui/tubelight-navbar";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -6,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { LayoutDashboard, FileText, Users, BarChart3, Settings, Phone, Mail, MapPin } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
+import AddContractorDialog from "@/components/AddContractorDialog";
 
 const navItems = [
   { name: "Dashboard", url: "/officer-dashboard", icon: LayoutDashboard },
@@ -21,22 +23,88 @@ interface Contractor {
   phone: string;
   email: string | null;
   nagar_id: string;
+  nagars?: {
+    name: string;
+  };
 }
 
 const OfficerContractors: React.FC = () => {
+  const navigate = useNavigate();
   const [contractors, setContractors] = useState<Contractor[]>([]);
   const [loading, setLoading] = useState(true);
+  const [officerData, setOfficerData] = useState<any>(null);
+  const [showAddDialog, setShowAddDialog] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
-    fetchContractors();
+    checkAuthAndFetchData();
   }, []);
 
-  const fetchContractors = async () => {
+  const checkAuthAndFetchData = async () => {
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        navigate('/officer-auth');
+        return;
+      }
+
+      // Check if user is an officer
+      const { data: officer, error: officerError } = await supabase
+        .from('officers')
+        .select('*')
+        .eq('user_id', session.user.id)
+        .single();
+
+      if (officerError || !officer) {
+        toast({
+          title: "Access denied",
+          description: "Officer account required.",
+          variant: "destructive",
+        });
+        await supabase.auth.signOut();
+        navigate('/');
+        return;
+      }
+
+      setOfficerData(officer);
+      fetchContractors(officer.city_id);
+      
+    } catch (error) {
+      console.error('Auth check error:', error);
+      navigate('/officer-auth');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchContractors = async (cityId: string) => {
+    try {
+      // First get nagars for this city
+      const { data: nagars, error: nagarError } = await supabase
+        .from('nagars')
+        .select('id')
+        .eq('city_id', cityId);
+
+      if (nagarError) throw nagarError;
+
+      const nagarIds = nagars?.map(n => n.id) || [];
+
+      if (nagarIds.length === 0) {
+        setContractors([]);
+        return;
+      }
+
+      // Then get contractors for these nagars
       const { data, error } = await supabase
         .from('contractors')
-        .select('*');
+        .select(`
+          *,
+          nagars:nagar_id (
+            name
+          )
+        `)
+        .in('nagar_id', nagarIds);
 
       if (error) throw error;
       
@@ -48,8 +116,6 @@ const OfficerContractors: React.FC = () => {
         description: "Failed to load contractors",
         variant: "destructive",
       });
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -67,7 +133,9 @@ const OfficerContractors: React.FC = () => {
                 Manage registered contractors
               </p>
             </div>
-            <Button variant="default">Add Contractor</Button>
+            <Button variant="default" onClick={() => setShowAddDialog(true)}>
+              Add Contractor
+            </Button>
           </div>
         </div>
 
@@ -100,7 +168,7 @@ const OfficerContractors: React.FC = () => {
                     )}
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <MapPin className="w-4 h-4" />
-                      Nagar ID: {contractor.nagar_id}
+                      {contractor.nagars?.name || 'Unknown Nagar'}
                     </div>
                     <div className="flex gap-2 pt-2">
                       <Button variant="outline" size="sm">Edit</Button>
@@ -121,6 +189,16 @@ const OfficerContractors: React.FC = () => {
           )}
         </div>
       </main>
+
+      {/* Add Contractor Dialog */}
+      {officerData && (
+        <AddContractorDialog
+          isOpen={showAddDialog}
+          onClose={() => setShowAddDialog(false)}
+          onSuccess={() => fetchContractors(officerData.city_id)}
+          officerCityId={officerData.city_id}
+        />
+      )}
     </div>
   );
 };

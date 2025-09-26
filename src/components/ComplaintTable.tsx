@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,76 +13,75 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { Eye, UserPlus, MapPin, Search, Filter, Phone, User } from 'lucide-react';
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
-const ComplaintTable: React.FC = () => {
+interface ComplaintTableProps {
+  cityId?: string;
+}
+
+const ComplaintTable: React.FC<ComplaintTableProps> = ({ cityId }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const [complaints, setComplaints] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
-  // Sample complaint data with enhanced info
-  const complaints = [
-    {
-      id: 'CMP-001',
-      category: 'Roads',
-      categoryIcon: '🛣️',
-      location: 'Andheri West, Mumbai, Maharashtra',
-      citizen: 'Rahul Sharma',  
-      phone: '+91 98765 43210',
-      daysPending: 3,
-      status: 'pending',
-      contractor: 'ABC Infrastructure',
-      priority: 'medium'
-    },
-    {
-      id: 'CMP-002',
-      category: 'Sewage',
-      categoryIcon: '💧',
-      location: 'Connaught Place, Delhi, Delhi',
-      citizen: 'Priya Patel',
-      phone: '+91 87654 32109',
-      daysPending: 0,
-      status: 'resolved',
-      contractor: 'XYZ Contractors',
-      priority: 'high'
-    },
-    {
-      id: 'CMP-003',
-      category: 'Sanitation',
-      categoryIcon: '🧹',
-      location: 'Koramangala, Bangalore, Karnataka',
-      citizen: 'Arjun Kumar',
-      phone: '+91 76543 21098',
-      daysPending: 12,
-      status: 'delayed',
-      contractor: 'Clean City Corp',
-      priority: 'high'
-    },
-    {
-      id: 'CMP-004',
-      category: 'Other',
-      categoryIcon: '⚙️',
-      location: 'T. Nagar, Chennai, Tamil Nadu',
-      citizen: 'Meera Nair',
-      phone: '+91 65432 10987',
-      daysPending: 5,
-      status: 'pending',
-      contractor: 'Not Assigned',
-      priority: 'low'
-    },
-    {
-      id: 'CMP-005',
-      category: 'Roads',
-      categoryIcon: '🛣️',
-      location: 'Banjara Hills, Hyderabad, Telangana',
-      citizen: 'Vikram Singh',
-      phone: '+91 54321 09876',
-      daysPending: 1,
-      status: 'resolved',
-      contractor: 'Road Masters Ltd',
-      priority: 'medium'
+  useEffect(() => {
+    fetchComplaints();
+  }, [cityId]);
+
+  const fetchComplaints = async () => {
+    try {
+      setLoading(true);
+      
+      const query = supabase
+        .from('complaints')
+        .select(`
+          *,
+          cities:city_id (name),
+          nagars:nagar_id (name)
+        `)
+        .order('created_at', { ascending: false });
+      
+      if (cityId) {
+        query.eq('city_id', cityId);
+      }
+
+      const { data, error } = await query.limit(50);
+
+      if (error) throw error;
+      
+      setComplaints(data || []);
+    } catch (error) {
+      console.error('Error fetching complaints:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load complaints",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
 
+  const calculateDaysPending = (createdAt: string, status: string) => {
+    if (status === 'resolved') return 0;
+    const now = new Date();
+    const createdDate = new Date(createdAt);
+    return Math.floor((now.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24));
+  };
+
+  const getCategoryIcon = (category: string) => {
+    const icons: { [key: string]: string } = {
+      'roads': '🛣️',
+      'sewage': '💧', 
+      'sanitation': '🧹',
+      'other': '⚙️'
+    };
+    return icons[category.toLowerCase()] || '⚙️';
+  };
   const getStatusBadge = (status: string) => {
     const statusConfig = {
       resolved: { 
@@ -93,9 +92,9 @@ const ComplaintTable: React.FC = () => {
         className: "bg-warning/10 text-warning border-warning/20 hover:bg-warning/20", 
         label: "Pending" 
       },
-      delayed: { 
-        className: "bg-danger/10 text-danger border-danger/20 hover:bg-danger/20", 
-        label: "Delayed" 
+      in_progress: { 
+        className: "bg-primary/10 text-primary border-primary/20 hover:bg-primary/20", 
+        label: "In Progress" 
       }
     };
     
@@ -108,9 +107,9 @@ const ComplaintTable: React.FC = () => {
   };
 
   const filteredComplaints = complaints.filter(complaint => {
-    const matchesSearch = complaint.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         complaint.citizen.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         complaint.location.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = (complaint.complaint_number || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (complaint.citizen_name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (complaint.address || '').toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || complaint.status === statusFilter;
     const matchesCategory = categoryFilter === 'all' || complaint.category === categoryFilter;
     
@@ -149,7 +148,7 @@ const ComplaintTable: React.FC = () => {
                 <SelectItem value="all">All Status</SelectItem>
                 <SelectItem value="pending">Pending</SelectItem>
                 <SelectItem value="resolved">Resolved</SelectItem>
-                <SelectItem value="delayed">Delayed</SelectItem>
+                <SelectItem value="in_progress">In Progress</SelectItem>
               </SelectContent>
             </Select>
             
@@ -159,10 +158,10 @@ const ComplaintTable: React.FC = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Categories</SelectItem>
-                <SelectItem value="Roads">🛣️ Roads</SelectItem>
-                <SelectItem value="Sewage">💧 Sewage</SelectItem>
-                <SelectItem value="Sanitation">🧹 Sanitation</SelectItem>
-                <SelectItem value="Other">⚙️ Other</SelectItem>
+                <SelectItem value="roads">🛣️ Roads</SelectItem>
+                <SelectItem value="sewage">💧 Sewage</SelectItem>
+                <SelectItem value="sanitation">🧹 Sanitation</SelectItem>
+                <SelectItem value="other">⚙️ Other</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -170,116 +169,110 @@ const ComplaintTable: React.FC = () => {
       </CardHeader>
       
       <CardContent>
-        <div className="rounded-lg border border-border/50 overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-muted/30 border-b border-border/50 hover:bg-muted/30">
-                <TableHead className="font-semibold text-foreground">ID</TableHead>
-                <TableHead className="font-semibold text-foreground">Category</TableHead>
-                <TableHead className="font-semibold text-foreground">Location</TableHead>
-                <TableHead className="font-semibold text-foreground">Citizen Info</TableHead>
-                <TableHead className="font-semibold text-foreground">Duration</TableHead>
-                <TableHead className="font-semibold text-foreground">Status</TableHead>
-                <TableHead className="font-semibold text-foreground">Contractor</TableHead>
-                <TableHead className="font-semibold text-foreground text-center">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredComplaints.map((complaint, index) => (
-                <TableRow 
-                  key={complaint.id} 
-                  className={`hover:bg-muted/20 transition-colors border-b border-border/30 ${
-                    index % 2 === 0 ? "bg-background" : "bg-muted/10"
-                  }`}
-                >
-                  <TableCell className="font-semibold text-primary">
-                    {complaint.id}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg">{complaint.categoryIcon}</span>
-                      <Badge variant="outline" className="text-xs font-medium border-border/50">
-                        {complaint.category}
-                      </Badge>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-sm text-muted-foreground max-w-48">
-                    <div className="truncate" title={complaint.location}>
-                      {complaint.location}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-1 text-sm font-medium">
-                        <User className="h-3 w-3 text-muted-foreground" />
-                        {complaint.citizen}
-                      </div>
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <Phone className="h-3 w-3" />
-                        {complaint.phone}
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <span className={`text-sm font-medium px-2 py-1 rounded-full ${
-                      complaint.daysPending > 7 ? 'bg-danger/10 text-danger' : 
-                      complaint.daysPending > 3 ? 'bg-warning/10 text-warning' : 
-                      complaint.daysPending === 0 ? 'bg-success/10 text-success' :
-                      'bg-muted/20 text-muted-foreground'
-                    }`}>
-                      {complaint.daysPending === 0 ? 'Completed' : `${complaint.daysPending} days`}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    {getStatusBadge(complaint.status)}
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    <div className={`flex items-center gap-2 ${
-                      complaint.contractor === 'Not Assigned' ? 'text-muted-foreground italic' : 'text-foreground'
-                    }`}>
-                      {complaint.contractor !== 'Not Assigned' && (
-                        <div className="w-6 h-6 bg-gradient-to-br from-primary to-civic rounded-full flex items-center justify-center text-white text-xs font-bold">
-                          {complaint.contractor.charAt(0)}
-                        </div>
-                      )}
-                      <span className="truncate max-w-32" title={complaint.contractor}>
-                        {complaint.contractor}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex gap-2 justify-center">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="h-8 px-3 hover-lift border-border/50 hover:border-primary hover:text-primary"
-                      >
-                        <Eye className="h-3 w-3 mr-1" />
-                        View
-                      </Button>
-                      {complaint.contractor === 'Not Assigned' && (
-                        <Button 
-                          size="sm" 
-                          className="h-8 px-3 hover-lift civic-gradient text-white hover:opacity-90"
-                        >
-                          <UserPlus className="h-3 w-3 mr-1" />
-                          Assign
-                        </Button>
-                      )}
-                    </div>
-                  </TableCell>
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        ) : (
+          <div className="rounded-lg border border-border/50 overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-muted/30 border-b border-border/50 hover:bg-muted/30">
+                  <TableHead className="font-semibold text-foreground">ID</TableHead>
+                  <TableHead className="font-semibold text-foreground">Category</TableHead>
+                  <TableHead className="font-semibold text-foreground">Location</TableHead>
+                  <TableHead className="font-semibold text-foreground">Citizen Info</TableHead>
+                  <TableHead className="font-semibold text-foreground">Duration</TableHead>
+                  <TableHead className="font-semibold text-foreground">Status</TableHead>
+                  <TableHead className="font-semibold text-foreground text-center">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          
-          {filteredComplaints.length === 0 && (
-            <div className="p-8 text-center text-muted-foreground">
-              <div className="text-4xl mb-2">🔍</div>
-              <p>No complaints found matching your criteria.</p>
-            </div>
-          )}
-        </div>
+              </TableHeader>
+              <TableBody>
+                {filteredComplaints.map((complaint, index) => {
+                  const daysPending = calculateDaysPending(complaint.created_at, complaint.status);
+                  return (
+                    <TableRow 
+                      key={complaint.id} 
+                      className={`hover:bg-muted/20 transition-colors border-b border-border/30 ${
+                        index % 2 === 0 ? "bg-background" : "bg-muted/10"
+                      }`}
+                    >
+                      <TableCell className="font-semibold text-primary">
+                        {complaint.complaint_number || `CMP-${complaint.id.slice(0, 8)}`}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">{getCategoryIcon(complaint.category)}</span>
+                          <Badge variant="outline" className="text-xs font-medium border-border/50">
+                            {complaint.category}
+                          </Badge>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground max-w-48">
+                        <div className="truncate" title={complaint.address || 'No address provided'}>
+                          {complaint.address || complaint.nagars?.name || 'Unknown location'}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-1 text-sm font-medium">
+                            <User className="h-3 w-3 text-muted-foreground" />
+                            {complaint.citizen_name}
+                          </div>
+                          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                            <Phone className="h-3 w-3" />
+                            {complaint.citizen_phone}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <span className={`text-sm font-medium px-2 py-1 rounded-full ${
+                          daysPending > 7 ? 'bg-danger/10 text-danger' : 
+                          daysPending > 3 ? 'bg-warning/10 text-warning' : 
+                          daysPending === 0 ? 'bg-success/10 text-success' :
+                          'bg-muted/20 text-muted-foreground'
+                        }`}>
+                          {daysPending === 0 ? 'Completed' : `${daysPending} days`}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        {getStatusBadge(complaint.status)}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-2 justify-center">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="h-8 px-3 hover-lift border-border/50 hover:border-primary hover:text-primary"
+                          >
+                            <Eye className="h-3 w-3 mr-1" />
+                            View
+                          </Button>
+                          {complaint.status === 'pending' && (
+                            <Button 
+                              size="sm" 
+                              className="h-8 px-3 hover-lift civic-gradient text-white hover:opacity-90"
+                            >
+                              <UserPlus className="h-3 w-3 mr-1" />
+                              Assign
+                            </Button>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+            
+            {filteredComplaints.length === 0 && !loading && (
+              <div className="p-8 text-center text-muted-foreground">
+                <div className="text-4xl mb-2">📋</div>
+                <p>No complaints found matching your criteria.</p>
+              </div>
+            )}
+          </div>
+        )}
       </CardContent>
     </Card>
   );
