@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -126,30 +126,42 @@ const ComplaintTable: React.FC<ComplaintTableProps> = ({ cityId, officerCityId }
     );
   };
 
-  const filteredComplaints = complaints.filter(complaint => {
-    if (!searchTerm.trim()) {
-      // If no search term, only apply status and category filters
+  const filteredComplaints = useMemo(() => {
+    console.log('Filtering complaints with search term:', searchTerm);
+    console.log('Total complaints:', complaints.length);
+    
+    return complaints.filter(complaint => {
+      if (!searchTerm.trim()) {
+        // If no search term, only apply status and category filters
+        const matchesStatus = statusFilter === 'all' || complaint.status === statusFilter;
+        const matchesCategory = categoryFilter === 'all' || complaint.category === categoryFilter;
+        return matchesStatus && matchesCategory;
+      }
+
+      const searchLower = searchTerm.toLowerCase().trim();
+      console.log('Searching for:', searchLower);
+      
+      const matchesSearch = 
+        (complaint.complaint_number || '').toLowerCase().includes(searchLower) ||
+        (complaint.citizen_name || '').toLowerCase().includes(searchLower) ||
+        (complaint.citizen_phone || '').toLowerCase().includes(searchLower) ||
+        (complaint.address || '').toLowerCase().includes(searchLower) ||
+        (complaint.description || '').toLowerCase().includes(searchLower) ||
+        (complaint.nagars?.name || '').toLowerCase().includes(searchLower) ||
+        (complaint.cities?.name || '').toLowerCase().includes(searchLower) ||
+        (complaint.category || '').toLowerCase().includes(searchLower);
+      
       const matchesStatus = statusFilter === 'all' || complaint.status === statusFilter;
       const matchesCategory = categoryFilter === 'all' || complaint.category === categoryFilter;
-      return matchesStatus && matchesCategory;
-    }
-
-    const searchLower = searchTerm.toLowerCase().trim();
-    const matchesSearch = 
-      (complaint.complaint_number || '').toLowerCase().includes(searchLower) ||
-      (complaint.citizen_name || '').toLowerCase().includes(searchLower) ||
-      (complaint.citizen_phone || '').toLowerCase().includes(searchLower) ||
-      (complaint.address || '').toLowerCase().includes(searchLower) ||
-      (complaint.description || '').toLowerCase().includes(searchLower) ||
-      (complaint.nagars?.name || '').toLowerCase().includes(searchLower) ||
-      (complaint.cities?.name || '').toLowerCase().includes(searchLower) ||
-      (complaint.category || '').toLowerCase().includes(searchLower);
-    
-    const matchesStatus = statusFilter === 'all' || complaint.status === statusFilter;
-    const matchesCategory = categoryFilter === 'all' || complaint.category === categoryFilter;
-    
-    return matchesSearch && matchesStatus && matchesCategory;
-  });
+      
+      const result = matchesSearch && matchesStatus && matchesCategory;
+      if (searchTerm.trim()) {
+        console.log(`Complaint ${complaint.id}: search=${matchesSearch}, status=${matchesStatus}, category=${matchesCategory}, final=${result}`);
+      }
+      
+      return result;
+    });
+  }, [complaints, searchTerm, statusFilter, categoryFilter]);
 
   return (
     <Card className="w-full border-0 shadow-lg bg-gradient-to-br from-white to-muted/10">
