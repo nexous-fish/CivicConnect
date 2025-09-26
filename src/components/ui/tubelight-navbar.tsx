@@ -34,9 +34,19 @@ export function NavBar({ items, className }: NavBarProps) {
 
   // Update active tab based on current route
   useEffect(() => {
-    const currentItem = items.find(item => 
-      location.pathname === item.url || location.pathname.startsWith(`${item.url}/`)
-    )
+    // First try exact match
+    let currentItem = items.find(item => location.pathname === item.url)
+    
+    // If no exact match, find the longest matching prefix (most specific)
+    if (!currentItem) {
+      const matchingItems = items.filter(item => 
+        location.pathname.startsWith(`${item.url}/`)
+      )
+      // Sort by URL length (longest first) to get most specific match
+      matchingItems.sort((a, b) => b.url.length - a.url.length)
+      currentItem = matchingItems[0]
+    }
+    
     if (currentItem) {
       setActiveTab(currentItem.name)
     }
