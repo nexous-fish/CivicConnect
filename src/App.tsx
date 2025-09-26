@@ -11,6 +11,8 @@ import OfficerComplaints from "./pages/OfficerComplaints";
 import OfficerContractors from "./pages/OfficerContractors";
 import OfficerAnalytics from "./pages/OfficerAnalytics";
 import OfficerSettings from "./pages/OfficerSettings";
+import UserAuth from "./pages/UserAuth";
+import UserDashboard from "./pages/UserDashboard";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +24,8 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/user-auth" element={<UserAuth />} />
+          <Route path="/user-dashboard" element={<UserDashboard />} />
           <Route path="/officer-auth" element={<OfficerAuth />} />
           <Route path="/officer-dashboard" element={<OfficerDashboard />} />
           <Route path="/officer-dashboard/complaints" element={<OfficerComplaints />} />
