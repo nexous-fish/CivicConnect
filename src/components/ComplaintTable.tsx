@@ -127,9 +127,24 @@ const ComplaintTable: React.FC<ComplaintTableProps> = ({ cityId, officerCityId }
   };
 
   const filteredComplaints = complaints.filter(complaint => {
-    const matchesSearch = (complaint.complaint_number || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (complaint.citizen_name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (complaint.address || '').toLowerCase().includes(searchTerm.toLowerCase());
+    if (!searchTerm.trim()) {
+      // If no search term, only apply status and category filters
+      const matchesStatus = statusFilter === 'all' || complaint.status === statusFilter;
+      const matchesCategory = categoryFilter === 'all' || complaint.category === categoryFilter;
+      return matchesStatus && matchesCategory;
+    }
+
+    const searchLower = searchTerm.toLowerCase().trim();
+    const matchesSearch = 
+      (complaint.complaint_number || '').toLowerCase().includes(searchLower) ||
+      (complaint.citizen_name || '').toLowerCase().includes(searchLower) ||
+      (complaint.citizen_phone || '').toLowerCase().includes(searchLower) ||
+      (complaint.address || '').toLowerCase().includes(searchLower) ||
+      (complaint.description || '').toLowerCase().includes(searchLower) ||
+      (complaint.nagars?.name || '').toLowerCase().includes(searchLower) ||
+      (complaint.cities?.name || '').toLowerCase().includes(searchLower) ||
+      (complaint.category || '').toLowerCase().includes(searchLower);
+    
     const matchesStatus = statusFilter === 'all' || complaint.status === statusFilter;
     const matchesCategory = categoryFilter === 'all' || complaint.category === categoryFilter;
     
