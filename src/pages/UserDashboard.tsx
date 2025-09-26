@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
+import { NavBar } from "@/components/ui/tubelight-navbar";
 import { 
   AlertTriangle, 
   CheckCircle, 
@@ -20,13 +21,14 @@ import {
   BarChart3,
   Timer,
   Eye,
-  Filter
+  Filter,
+  LayoutDashboard,
+  HelpCircle
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import ComplaintWizard from "@/components/ComplaintWizard";
-import { UserSidebar } from "@/components/UserSidebar";
 import { format, differenceInDays } from 'date-fns';
 
 interface UserProfile {
@@ -45,15 +47,21 @@ interface Complaint {
   resolved_at: string | null;
 }
 
+// Navigation items for user dashboard
+const navItems = [
+  { name: "Dashboard", url: "/user-dashboard", icon: LayoutDashboard },
+  { name: "My Complaints", url: "/user-dashboard/complaints", icon: FileText },
+  { name: "Profile", url: "/user-dashboard/profile", icon: User },
+  { name: "Help", url: "/user-dashboard/help", icon: HelpCircle },
+];
+
 const UserDashboard: React.FC = () => {
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [complaints, setComplaints] = useState<Complaint[]>([]);
-  const [filteredComplaints, setFilteredComplaints] = useState<Complaint[]>([]);
   const [stats, setStats] = useState({ total: 0, pending: 0, resolved: 0, delayed: 0 });
   const [showComplaintWizard, setShowComplaintWizard] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('dashboard');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedComplaint, setSelectedComplaint] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -104,7 +112,6 @@ const UserDashboard: React.FC = () => {
       if (complaintsError) throw complaintsError;
       
       setComplaints(complaintsData || []);
-      setFilteredComplaints(complaintsData || []);
       
       // Calculate stats
       const total = complaintsData?.length || 0;
@@ -142,22 +149,17 @@ const UserDashboard: React.FC = () => {
     }
   };
 
-  // Search functionality
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-    if (!query) {
-      setFilteredComplaints(complaints);
-      return;
-    }
+  // Filter complaints based on search query
+  const filteredComplaints = React.useMemo(() => {
+    if (!searchQuery) return complaints;
     
-    const filtered = complaints.filter(complaint =>
-      complaint.category.toLowerCase().includes(query.toLowerCase()) ||
-      complaint.description.toLowerCase().includes(query.toLowerCase()) ||
-      complaint.address?.toLowerCase().includes(query.toLowerCase()) ||
-      complaint.status.toLowerCase().includes(query.toLowerCase())
+    return complaints.filter(complaint =>
+      complaint.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      complaint.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      complaint.address?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      complaint.status.toLowerCase().includes(searchQuery.toLowerCase())
     );
-    setFilteredComplaints(filtered);
-  };
+  }, [complaints, searchQuery]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -201,7 +203,7 @@ const UserDashboard: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background/50 to-muted/30 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-civic-light via-background to-primary-light/30 flex items-center justify-center">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-muted-foreground text-lg font-medium">Loading dashboard...</p>
@@ -212,410 +214,48 @@ const UserDashboard: React.FC = () => {
 
   if (showComplaintWizard) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background to-muted/30 py-8">
-        <div className="container mx-auto px-4">
-          <Button
-            variant="ghost"
-            onClick={() => setShowComplaintWizard(false)}
-            className="mb-4 hover:bg-muted/50"
-          >
-            ← Back to Dashboard
-          </Button>
-          <ComplaintWizard onClose={() => {
-            setShowComplaintWizard(false);
-            if (profile) loadUserData(user.id);
-          }} />
-        </div>
+      <div className="min-h-screen bg-gradient-to-br from-civic-light via-background to-primary-light/30">
+        <NavBar items={navItems} />
+        <main className="pt-4 sm:pt-16 pb-24 sm:pb-6">
+          <div className="container mx-auto px-4">
+            <Button
+              variant="ghost"
+              onClick={() => setShowComplaintWizard(false)}
+              className="mb-4 hover:bg-muted/50"
+            >
+              ← Back to Dashboard
+            </Button>
+            <ComplaintWizard onClose={() => {
+              setShowComplaintWizard(false);
+              if (profile && user) loadUserData(user.id);
+            }} />
+          </div>
+        </main>
       </div>
     );
   }
 
-  const renderDashboardContent = () => (
-    <div className="space-y-8">
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="bg-gradient-to-br from-card to-card/80 hover:shadow-lg transition-shadow duration-300">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Total Complaints</p>
-                <p className="text-3xl font-bold text-foreground mt-1">{stats.total}</p>
-                <p className="text-xs text-muted-foreground mt-1">All time</p>
-              </div>
-              <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
-                <FileText className="w-6 h-6 text-primary" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-card to-card/80 hover:shadow-lg transition-shadow duration-300">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Resolved</p>
-                <p className="text-3xl font-bold text-success mt-1">{stats.resolved}</p>
-                <p className="text-xs text-muted-foreground mt-1">✅ Completed</p>
-              </div>
-              <div className="w-12 h-12 bg-success/10 rounded-xl flex items-center justify-center">
-                <CheckCircle className="w-6 h-6 text-success" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-card to-card/80 hover:shadow-lg transition-shadow duration-300">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Pending</p>
-                <p className="text-3xl font-bold text-warning mt-1">{stats.pending}</p>
-                <p className="text-xs text-muted-foreground mt-1">⏳ In progress</p>
-              </div>
-              <div className="w-12 h-12 bg-warning/10 rounded-xl flex items-center justify-center">
-                <Clock className="w-6 h-6 text-warning" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-card to-card/80 hover:shadow-lg transition-shadow duration-300">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Delayed</p>
-                <p className="text-3xl font-bold text-danger mt-1">{stats.delayed}</p>
-                <p className="text-xs text-muted-foreground mt-1">⚠️ Over 7 days</p>
-              </div>
-              <div className="w-12 h-12 bg-danger/10 rounded-xl flex items-center justify-center">
-                <Timer className="w-6 h-6 text-danger" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Quick Actions */}
-      <Card className="bg-gradient-to-r from-primary to-civic text-primary-foreground">
-        <CardContent className="p-8">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <div>
-              <h3 className="text-xl font-bold mb-2">Need to report an issue?</h3>
-              <p className="opacity-90">File a new complaint and get it resolved by local authorities.</p>
-            </div>
-            <Button 
-              onClick={() => setShowComplaintWizard(true)}
-              size="lg"
-              variant="secondary"
-              className="bg-white text-primary hover:bg-white/90 font-semibold"
-            >
-              <Plus className="w-5 h-5 mr-2" />
-              Add New Complaint
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Recent Complaints */}
-      <Card>
-        <CardHeader>
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <CardTitle className="text-xl font-serif">My Complaints</CardTitle>
-              <p className="text-sm text-muted-foreground mt-1">Track and manage your reported issues</p>
-            </div>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder="Search complaints..."
-                value={searchQuery}
-                onChange={(e) => handleSearch(e.target.value)}
-                className="pl-10 w-full md:w-80"
-              />
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {filteredComplaints.length === 0 && complaints.length > 0 ? (
-            <div className="text-center py-8">
-              <Filter className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">No complaints match your search</p>
-            </div>
-          ) : filteredComplaints.length === 0 ? (
-            <div className="text-center py-12">
-              <FileText className="w-16 h-16 text-muted-foreground mx-auto mb-6 opacity-50" />
-              <h3 className="text-lg font-semibold text-muted-foreground mb-2">No complaints filed yet</h3>
-              <p className="text-muted-foreground mb-6">Start by reporting your first civic issue</p>
-              <Button 
-                onClick={() => setShowComplaintWizard(true)}
-                variant="outline"
-                size="lg"
-              >
-                <Plus className="w-5 h-5 mr-2" />
-                File Your First Complaint
-              </Button>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {filteredComplaints.map((complaint) => {
-                const isDelayed = getDelayedStatus(complaint);
-                const progress = getProgressPercentage(complaint.status);
-                
-                return (
-                  <Card 
-                    key={complaint.id} 
-                    className={`transition-all duration-200 hover:shadow-md cursor-pointer ${
-                      selectedComplaint === complaint.id ? 'ring-2 ring-primary' : ''
-                    } ${isDelayed ? 'border-danger/20 bg-danger/5' : ''}`}
-                    onClick={() => setSelectedComplaint(
-                      selectedComplaint === complaint.id ? null : complaint.id
-                    )}
-                  >
-                    <CardContent className="p-6">
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex items-start gap-3 flex-1">
-                          <div className="flex items-center gap-2">
-                            {getStatusIcon(complaint.status)}
-                            <Badge className={`${getStatusColor(complaint.status)} border`}>
-                              {complaint.status.replace('_', ' ')}
-                            </Badge>
-                            {isDelayed && (
-                              <Badge variant="destructive" className="text-xs">
-                                Delayed
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <Calendar className="w-4 h-4" />
-                          <span>{format(new Date(complaint.created_at), 'MMM d, yyyy')}</span>
-                          <Button variant="ghost" size="sm" className="ml-2">
-                            <Eye className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </div>
-
-                      <div className="space-y-3">
-                        <div>
-                          <h4 className="font-semibold text-lg capitalize text-foreground">
-                            {complaint.category}
-                          </h4>
-                          <p className="text-muted-foreground mt-1 line-clamp-2">
-                            {complaint.description}
-                          </p>
-                        </div>
-
-                        {complaint.address && (
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <MapPin className="w-4 h-4" />
-                            <span>{complaint.address}</span>
-                          </div>
-                        )}
-
-                        {/* Progress Tracker */}
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium">Progress</span>
-                            <span className="text-sm text-muted-foreground">{progress}%</span>
-                          </div>
-                          <Progress value={progress} className="h-2" />
-                          <div className="flex justify-between text-xs text-muted-foreground">
-                            <span className={progress >= 25 ? 'text-primary' : ''}>Filed</span>
-                            <span className={progress >= 50 ? 'text-primary' : ''}>Assigned</span>
-                            <span className={progress >= 75 ? 'text-primary' : ''}>In Progress</span>
-                            <span className={progress >= 100 ? 'text-success' : ''}>Resolved</span>
-                          </div>
-                        </div>
-
-                        {complaint.resolved_at && (
-                          <div className="mt-4 p-3 bg-success/10 rounded-lg border border-success/20">
-                            <div className="flex items-center gap-2 text-success font-medium">
-                              <CheckCircle className="w-4 h-4" />
-                              <span>Resolved on {format(new Date(complaint.resolved_at), 'MMM d, yyyy')}</span>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
-  );
-
-  const renderComplaintsContent = () => (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="font-serif">All My Complaints</CardTitle>
-          <p className="text-muted-foreground">Detailed view of all your reported issues</p>
-        </CardHeader>
-        <CardContent>
-          {/* Same complaints list as dashboard */}
-          {renderDashboardContent()}
-        </CardContent>
-      </Card>
-    </div>
-  );
-
-  const renderProfileContent = () => (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="font-serif">Profile Information</CardTitle>
-          <p className="text-muted-foreground">Your account details and preferences</p>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="flex items-center gap-4">
-            <div className="w-20 h-20 bg-gradient-to-br from-primary to-civic rounded-2xl flex items-center justify-center text-white font-bold text-2xl shadow-lg">
-              {profile?.full_name?.charAt(0).toUpperCase()}
-            </div>
-            <div>
-              <h3 className="text-xl font-semibold">{profile?.full_name}</h3>
-              <p className="text-muted-foreground">{profile?.phone}</p>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card>
-              <CardContent className="p-6">
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <User className="w-5 h-5 text-muted-foreground" />
-                    <div>
-                      <p className="font-medium">Full Name</p>
-                      <p className="text-muted-foreground">{profile?.full_name}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Phone className="w-5 h-5 text-muted-foreground" />
-                    <div>
-                      <p className="font-medium">Phone Number</p>
-                      <p className="text-muted-foreground">{profile?.phone}</p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardContent className="p-6">
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <BarChart3 className="w-5 h-5 text-muted-foreground" />
-                    <div>
-                      <p className="font-medium">Account Statistics</p>
-                      <p className="text-muted-foreground">{stats.total} complaints filed</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <TrendingUp className="w-5 h-5 text-muted-foreground" />
-                    <div>
-                      <p className="font-medium">Success Rate</p>
-                      <p className="text-muted-foreground">
-                        {stats.total > 0 ? Math.round((stats.resolved / stats.total) * 100) : 0}% resolved
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-
-  const renderHelpContent = () => (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="font-serif">Help & Support</CardTitle>
-          <p className="text-muted-foreground">Get help with using the platform</p>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="p-4 border rounded-lg">
-              <h4 className="font-semibold mb-2">How to file a complaint?</h4>
-              <p className="text-muted-foreground text-sm">
-                Click on "Add New Complaint" button and follow the step-by-step wizard to report your civic issue.
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-civic-light via-background to-primary-light/30">
+      <NavBar items={navItems} />
+      
+      <main className="pt-4 sm:pt-16 pb-24 sm:pb-6">
+        {/* Header */}
+        <div className="px-3 sm:px-6 py-3 sm:py-6 bg-background/80 backdrop-blur-sm border border-border mx-2 sm:mx-4 rounded-xl mb-4 sm:mb-6 shadow-card-shadow">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex-1">
+              <h1 className="text-xl sm:text-2xl font-bold text-foreground">User Dashboard</h1>
+              <p className="text-sm text-muted-foreground flex items-center gap-2 mt-1">
+                <span className="inline-block w-2 h-2 bg-success rounded-full animate-pulse"></span>
+                Welcome back, {profile?.full_name || 'User'}
               </p>
             </div>
-            <div className="p-4 border rounded-lg">
-              <h4 className="font-semibold mb-2">Complaint status meanings</h4>
-              <div className="space-y-2 text-sm">
-                <div className="flex items-center gap-2">
-                  <Badge className="bg-muted text-muted-foreground">Pending</Badge>
-                  <span>Complaint has been filed and is waiting for review</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Badge className="bg-primary/10 text-primary border-primary/20">Assigned</Badge>
-                  <span>Complaint has been assigned to a contractor</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Badge className="bg-warning/10 text-warning border-warning/20">In Progress</Badge>
-                  <span>Work is currently being done on your complaint</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Badge className="bg-success/10 text-success border-success/20">Resolved</Badge>
-                  <span>Your complaint has been successfully resolved</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'complaints': return renderComplaintsContent();
-      case 'profile': return renderProfileContent();
-      case 'help': return renderHelpContent();
-      default: return renderDashboardContent();
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background/50 to-muted/30 flex">
-      {/* Sidebar */}
-      <UserSidebar 
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        onSignOut={handleSignOut}
-        userName={profile?.full_name || 'User'}
-      />
-
-      {/* Main Content */}
-      <div className="flex-1 overflow-hidden">
-        {/* Header */}
-        <header className="border-b bg-card/80 backdrop-blur-sm">
-          <div className="px-8 py-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-2xl font-bold font-serif text-foreground">
-                  {activeTab === 'dashboard' && 'Dashboard'}
-                  {activeTab === 'complaints' && 'My Complaints'}
-                  {activeTab === 'profile' && 'Profile'}
-                  {activeTab === 'help' && 'Help & Support'}
-                </h1>
-                <p className="text-muted-foreground mt-1">
-                  {activeTab === 'dashboard' && 'Overview of your civic engagement'}
-                  {activeTab === 'complaints' && 'All your reported issues in one place'}
-                  {activeTab === 'profile' && 'Manage your account information'}
-                  {activeTab === 'help' && 'Get assistance and learn how to use the platform'}
-                </p>
-              </div>
-              <div className="text-right">
+            <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto justify-between sm:justify-end">
+              <div className="text-left sm:text-right">
                 <div className="text-sm font-medium text-foreground">
                   {new Date().toLocaleDateString('en-US', {
-                    weekday: 'long',
-                    month: 'long',
+                    weekday: 'short',
+                    month: 'short',
                     day: 'numeric'
                   })}
                 </div>
@@ -626,19 +266,241 @@ const UserDashboard: React.FC = () => {
                   })}
                 </div>
               </div>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-primary to-civic rounded-full flex items-center justify-center text-white font-semibold text-xs sm:text-sm shadow-lg">
+                  {(profile?.full_name || 'U').charAt(0).toUpperCase()}
+                </div>
+                <button
+                  onClick={handleSignOut}
+                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-destructive hover:bg-destructive/10 transition-colors duration-200"
+                >
+                  <LogOut className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="text-xs sm:text-sm">Logout</span>
+                </button>
+              </div>
             </div>
           </div>
-        </header>
+        </div>
 
-        {/* Content */}
-        <main className="p-8 overflow-auto h-[calc(100vh-140px)]">
-          <div className="animate-fade-in">
-            {renderContent()}
+        {/* Main Content */}
+        <div className="px-4 sm:px-6 space-y-8">
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Card className="bg-gradient-to-br from-card to-card/80 hover:shadow-lg transition-shadow duration-300">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Total Complaints</p>
+                    <p className="text-3xl font-bold text-foreground mt-1">{stats.total}</p>
+                    <p className="text-xs text-muted-foreground mt-1">All time</p>
+                  </div>
+                  <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+                    <FileText className="w-6 h-6 text-primary" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-card to-card/80 hover:shadow-lg transition-shadow duration-300">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Resolved</p>
+                    <p className="text-3xl font-bold text-success mt-1">{stats.resolved}</p>
+                    <p className="text-xs text-muted-foreground mt-1">✅ Completed</p>
+                  </div>
+                  <div className="w-12 h-12 bg-success/10 rounded-xl flex items-center justify-center">
+                    <CheckCircle className="w-6 h-6 text-success" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-card to-card/80 hover:shadow-lg transition-shadow duration-300">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Pending</p>
+                    <p className="text-3xl font-bold text-warning mt-1">{stats.pending}</p>
+                    <p className="text-xs text-muted-foreground mt-1">⏳ In progress</p>
+                  </div>
+                  <div className="w-12 h-12 bg-warning/10 rounded-xl flex items-center justify-center">
+                    <Clock className="w-6 h-6 text-warning" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-card to-card/80 hover:shadow-lg transition-shadow duration-300">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Delayed</p>
+                    <p className="text-3xl font-bold text-danger mt-1">{stats.delayed}</p>
+                    <p className="text-xs text-muted-foreground mt-1">⚠️ Over 7 days</p>
+                  </div>
+                  <div className="w-12 h-12 bg-danger/10 rounded-xl flex items-center justify-center">
+                    <Timer className="w-6 h-6 text-danger" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-        </main>
-      </div>
+
+          {/* Quick Actions */}
+          <Card className="bg-gradient-to-r from-primary to-civic text-primary-foreground">
+            <CardContent className="p-8">
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-xl font-bold mb-2">Need to report an issue?</h3>
+                  <p className="opacity-90">File a new complaint and get it resolved by local authorities.</p>
+                </div>
+                <Button 
+                  onClick={() => setShowComplaintWizard(true)}
+                  size="lg"
+                  variant="secondary"
+                  className="bg-white text-primary hover:bg-white/90 font-semibold"
+                >
+                  <Plus className="w-5 h-5 mr-2" />
+                  Add New Complaint
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Recent Complaints */}
+          <Card>
+            <CardHeader>
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                  <CardTitle className="text-xl font-serif">My Complaints</CardTitle>
+                  <p className="text-sm text-muted-foreground mt-1">Track and manage your reported issues</p>
+                </div>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search complaints..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10 w-full md:w-80"
+                  />
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {filteredComplaints.length === 0 && complaints.length > 0 ? (
+                <div className="text-center py-8">
+                  <Filter className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground">No complaints match your search</p>
+                </div>
+              ) : filteredComplaints.length === 0 ? (
+                <div className="text-center py-12">
+                  <FileText className="w-16 h-16 text-muted-foreground mx-auto mb-6 opacity-50" />
+                  <h3 className="text-lg font-semibold text-muted-foreground mb-2">No complaints filed yet</h3>
+                  <p className="text-muted-foreground mb-6">Start by reporting your first civic issue</p>
+                  <Button 
+                    onClick={() => setShowComplaintWizard(true)}
+                    variant="outline"
+                    size="lg"
+                  >
+                    <Plus className="w-5 h-5 mr-2" />
+                    File Your First Complaint
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {filteredComplaints.map((complaint) => {
+                    const isDelayed = getDelayedStatus(complaint);
+                    const progress = getProgressPercentage(complaint.status);
+                    
+                    return (
+                      <Card 
+                        key={complaint.id} 
+                        className={`transition-all duration-200 hover:shadow-md cursor-pointer ${
+                          selectedComplaint === complaint.id ? 'ring-2 ring-primary' : ''
+                        } ${isDelayed ? 'border-danger/20 bg-danger/5' : ''}`}
+                        onClick={() => setSelectedComplaint(
+                          selectedComplaint === complaint.id ? null : complaint.id
+                        )}
+                      >
+                        <CardContent className="p-6">
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-start gap-3 flex-1">
+                              <div className="flex items-center gap-2">
+                                {getStatusIcon(complaint.status)}
+                                <Badge className={`${getStatusColor(complaint.status)} border`}>
+                                  {complaint.status.replace('_', ' ')}
+                                </Badge>
+                                {isDelayed && (
+                                  <Badge variant="destructive" className="text-xs">
+                                    Delayed
+                                  </Badge>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <Calendar className="w-4 h-4" />
+                              <span>{format(new Date(complaint.created_at), 'MMM d, yyyy')}</span>
+                              <Button variant="ghost" size="sm" className="ml-2">
+                                <Eye className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </div>
+
+                          <div className="space-y-3">
+                            <div>
+                              <h4 className="font-semibold text-lg capitalize text-foreground">
+                                {complaint.category}
+                              </h4>
+                              <p className="text-muted-foreground mt-1 line-clamp-2">
+                                {complaint.description}
+                              </p>
+                            </div>
+
+                            {complaint.address && (
+                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                <MapPin className="w-4 h-4" />
+                                <span>{complaint.address}</span>
+                              </div>
+                            )}
+
+                            {/* Progress Tracker */}
+                            <div className="space-y-2">
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm font-medium">Progress</span>
+                                <span className="text-sm text-muted-foreground">{progress}%</span>
+                              </div>
+                              <Progress value={progress} className="h-2" />
+                              <div className="flex justify-between text-xs text-muted-foreground">
+                                <span className={progress >= 25 ? 'text-primary' : ''}>Filed</span>
+                                <span className={progress >= 50 ? 'text-primary' : ''}>Assigned</span>
+                                <span className={progress >= 75 ? 'text-primary' : ''}>In Progress</span>
+                                <span className={progress >= 100 ? 'text-success' : ''}>Resolved</span>
+                              </div>
+                            </div>
+
+                            {complaint.resolved_at && (
+                              <div className="mt-4 p-3 bg-success/10 rounded-lg border border-success/20">
+                                <div className="flex items-center gap-2 text-success font-medium">
+                                  <CheckCircle className="w-4 h-4" />
+                                  <span>Resolved on {format(new Date(complaint.resolved_at), 'MMM d, yyyy')}</span>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </main>
     </div>
   );
+
 };
 
 export default UserDashboard;
