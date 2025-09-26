@@ -6,8 +6,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
-import { Upload, Camera, MapPin, Phone, FileText, CheckCircle, ArrowLeft, ArrowRight } from 'lucide-react';
+import { Upload, Camera, MapPin, Phone, FileText, CheckCircle, ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface ComplaintData {
   photo: File | null;
@@ -56,6 +57,8 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [cities, setCities] = useState<City[]>([]);
   const [nagars, setNagars] = useState<Nagar[]>([]);
   const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const { toast } = useToast();
 
   const totalSteps = 5;
   const progress = (currentStep / totalSteps) * 100;
@@ -151,10 +154,19 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   };
 
   const handleSubmit = async () => {
+    setSubmitting(true);
+    
     try {
+      console.log('Starting complaint submission...', complaintData);
+      
       // Upload photo to Supabase storage if available
       let photoUrl = null;
       if (complaintData.photo) {
+        toast({
+          title: "Uploading photo...",
+          description: "Please wait while we upload your photo.",
+        });
+        
         const fileExt = complaintData.photo.name.split('.').pop();
         const fileName = `${Date.now()}.${fileExt}`;
         
@@ -164,16 +176,28 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
         if (uploadError) {
           console.error('Upload error:', uploadError);
+          toast({
+            title: "Photo upload failed",
+            description: "Failed to upload photo. Please try again.",
+            variant: "destructive",
+          });
+          return;
         } else {
           const { data: { publicUrl } } = supabase.storage
             .from('complaint-photos')
             .getPublicUrl(fileName);
           photoUrl = publicUrl;
+          console.log('Photo uploaded successfully:', photoUrl);
         }
       }
 
+      toast({
+        title: "Saving complaint...",
+        description: "Please wait while we save your complaint.",
+      });
+
       // Save complaint to database
-      const { data, error } = await supabase
+      const { data: complaintRecord, error } = await supabase
         .from('complaints')
         .insert({
           state_id: complaintData.state_id,
@@ -183,7 +207,7 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           citizen_name: complaintData.name,
           citizen_phone: complaintData.phone,
           description: complaintData.details,
-          category: complaintData.category as any, // Type assertion to handle enum mismatch
+          category: complaintData.category as any,
           photo_url: photoUrl
         })
         .select()
@@ -191,18 +215,67 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
       if (error) {
         console.error('Database error:', error);
-        alert('Failed to submit complaint. Please try again.');
+        toast({
+          title: "Submission failed",
+          description: `Failed to submit complaint: ${error.message}`,
+          variant: "destructive",
+        });
         return;
       }
 
-      console.log('Complaint submitted successfully:', data);
+      console.log('Complaint saved successfully:', complaintRecord);
+
+      // Send webhook notification
+      try {
+        const webhookData = {
+          id: complaintRecord.id,
+          citizen_name: complaintData.name,
+          citizen_phone: complaintData.phone,
+          category: complaintData.category,
+          description: complaintData.details,
+          address: complaintData.address,
+          photo_url: photoUrl,
+          status: complaintRecord.status,
+          created_at: complaintRecord.created_at,
+          complaint_reference: `CMP${Date.now().toString().slice(-6)}`
+        };
+
+        console.log('Sending webhook notification...', webhookData);
+
+        const webhookResponse = await fetch('https://mitulz.app.n8n.cloud/webhook/992930c7-973a-4357-8105-c6e3ca32faf9', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          mode: 'no-cors',
+          body: JSON.stringify(webhookData),
+        });
+
+        console.log('Webhook sent successfully');
+      } catch (webhookError) {
+        console.error('Webhook error (non-critical):', webhookError);
+        // Don't fail the submission if webhook fails
+      }
+
+      toast({
+        title: "Complaint submitted successfully!",
+        description: "Your complaint has been registered and we'll notify you of updates.",
+      });
+
       setCurrentStep(6); // Show success screen
       setTimeout(() => {
         onClose();
       }, 3000);
+
     } catch (error) {
       console.error('Submission error:', error);
-      alert('Failed to submit complaint. Please try again.');
+      toast({
+        title: "Submission failed",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -521,10 +594,20 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
               <Button
                 variant="civic"
                 onClick={handleSubmit}
+                disabled={submitting}
                 className="flex items-center gap-2"
               >
-                Submit Complaint
-                <CheckCircle className="w-4 h-4" />
+                {submitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Submitting...
+                  </>
+                ) : (
+                  <>
+                    Submit Complaint
+                    <CheckCircle className="w-4 h-4" />
+                  </>
+                )}
               </Button>
             )}
           </div>
