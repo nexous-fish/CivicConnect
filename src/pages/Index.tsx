@@ -56,23 +56,23 @@ const Index = () => {
   return <div className="min-h-screen hero-gradient">
       {/* Header */}
       <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-40">
-        <div className="container mx-auto px-4 py-4">
+        <div className="container mx-auto px-3 py-3 sm:px-4 sm:py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 civic-gradient rounded-lg flex items-center justify-center">
-                <MapPin className="w-6 h-6 text-white" />
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 civic-gradient rounded-lg flex items-center justify-center">
+                <MapPin className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-foreground">CivicConnect</h1>
-                <p className="text-sm text-muted-foreground">Municipal Complaint Portal</p>
+                <h1 className="text-lg sm:text-xl font-bold text-foreground">CivicConnect</h1>
+                <p className="text-xs sm:text-sm text-muted-foreground hidden xs:block">Municipal Complaint Portal</p>
               </div>
             </div>
-            <div className="flex gap-2">
-              <Button variant="civic-outline" size="sm" onClick={() => window.location.href = '/user-auth'}>
-                Citizen Login
+            <div className="flex gap-1 sm:gap-2">
+              <Button variant="civic-outline" size="sm" className="text-xs sm:text-sm px-2 sm:px-3" onClick={() => window.location.href = '/user-auth'}>
+                <span className="hidden sm:inline">Citizen</span> Login
               </Button>
-              <Button variant="civic-outline" size="sm" onClick={() => window.location.href = '/officer-auth'}>
-                Officer Login
+              <Button variant="civic-outline" size="sm" className="text-xs sm:text-sm px-2 sm:px-3" onClick={() => window.location.href = '/officer-auth'}>
+                <span className="hidden sm:inline">Officer</span> Login
               </Button>
             </div>
           </div>
