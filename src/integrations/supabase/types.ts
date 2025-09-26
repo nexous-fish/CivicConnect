@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      chathistory: {
+        Row: {
+          created_at: string
+          id: number
+          phone: string | null
+          text: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          phone?: string | null
+          text?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          phone?: string | null
+          text?: string | null
+        }
+        Relationships: []
+      }
       cities: {
         Row: {
           created_at: string
