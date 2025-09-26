@@ -16,7 +16,6 @@ import TopCitiesLeaderboard from "@/components/TopCitiesLeaderboard";
 import TrendingProblemsCloud from "@/components/TrendingProblemsCloud";
 import ResolvedHighlightsCarousel from "@/components/ResolvedHighlightsCarousel";
 import ReporterOfTheWeek from "@/components/ReporterOfTheWeek";
-import IndiaShowcaseSlider from "@/components/IndiaShowcaseSlider";
 const Index = () => {
   const [showWizard, setShowWizard] = useState(false);
   const {
@@ -140,22 +139,18 @@ const Index = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 justify-items-center">
             <CivicAnimatedCard title="Resolution Rate Analytics" description="Real-time complaint resolution tracking with interactive visualization" mainColor="hsl(var(--success))" secondaryColor="hsl(var(--primary))" />
             <AnimatedCard>
-              <CardVisual>
-                <Visual1 mainColor="hsl(var(--civic-accent))" secondaryColor="hsl(var(--primary))" />
-              </CardVisual>
+              
               <AnimatedCardBody>
-                <AnimatedCardTitle>Monthly Complaint Trends</AnimatedCardTitle>
+                
                 <AnimatedCardDescription>
                   Top state: {stateData?.[0]?.state_name || 'Maharashtra'} with {stateData?.[0]?.complaint_count || 72} complaints this month
                 </AnimatedCardDescription>
               </AnimatedCardBody>
             </AnimatedCard>
             <AnimatedChartCard>
-              <ChartCardVisual>
-                <Visual3 mainColor="hsl(var(--warning))" secondaryColor="hsl(var(--success))" />
-              </ChartCardVisual>
+              
               <ChartCardBody>
-                <ChartCardTitle>Weekly Resolution Analytics</ChartCardTitle>
+                
                 <ChartCardDescription>
                   Latest week: {weeklyData?.[weeklyData.length - 1]?.resolved_complaints || 22} of {weeklyData?.[weeklyData.length - 1]?.total_complaints || 34} complaints resolved
                 </ChartCardDescription>
@@ -173,11 +168,6 @@ const Index = () => {
               <p className="text-muted-foreground">Available in more than 30+ cities</p>
             </div>
             <GlobeDemo />
-          </div>
-
-          {/* India Showcase Slider */}
-          <div className="w-full mt-16">
-            <IndiaShowcaseSlider />
           </div>
         </div>
       </section>
