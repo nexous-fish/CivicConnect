@@ -72,7 +72,10 @@ export function Visual2({
 }: Visual2Props) {
   const [hovered, setHovered] = useState(false);
   return <>
-      
+      <div className="absolute inset-0 z-20" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} style={{
+      "--color": mainColor,
+      "--secondary-color": secondaryColor
+    } as React.CSSProperties} />
       <div className="relative h-[180px] w-[356px] overflow-hidden rounded-t-lg">
         <Layer1 hovered={hovered} color={mainColor} secondaryColor={secondaryColor} resolutionRate={resolutionRate} totalComplaints={totalComplaints} resolvedCount={resolvedCount} />
         <Layer2 color={mainColor} resolutionRate={resolutionRate} totalComplaints={totalComplaints} resolvedCount={resolvedCount} />
@@ -152,9 +155,7 @@ const Layer1: React.FC<LayerProps> = ({
         <div className="donut-chart-container relative">
           <svg width="120" height="120" viewBox="0 0 100 100">
             <circle cx="50" cy="50" r={radius} stroke="currentColor" strokeWidth="10" fill="transparent" opacity={0.2} />
-            <circle cx="50" cy="50" r={radius} stroke={secondaryColor} strokeWidth="14" fill="transparent" strokeDasharray={circumference} strokeDashoffset={secondaryDashoffset} transform="rotate(-90 50 50)" style={{
-            transition: "stroke-dashoffset 0.5s cubic-bezier(0.6, 0.6, 0, 1)"
-          }} />
+            
             <circle cx="50" cy="50" r={radius} stroke={color} strokeWidth="14" fill="transparent" strokeDasharray={circumference} strokeDashoffset={mainDashoffset} transform="rotate(-90 50 50)" style={{
             transition: "stroke-dashoffset 0.5s cubic-bezier(0.6, 0.6, 0, 1)"
           }} />

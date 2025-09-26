@@ -136,27 +136,7 @@ const Index = () => {
           </div>
 
           {/* Animated Cards Section */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 justify-items-center">
-            <CivicAnimatedCard title="Resolution Rate Analytics" description="Real-time complaint resolution tracking with interactive visualization" mainColor="hsl(var(--success))" secondaryColor="hsl(var(--primary))" />
-            <AnimatedCard>
-              
-              <AnimatedCardBody>
-                
-                <AnimatedCardDescription>
-                  Top state: {stateData?.[0]?.state_name || 'Maharashtra'} with {stateData?.[0]?.complaint_count || 72} complaints this month
-                </AnimatedCardDescription>
-              </AnimatedCardBody>
-            </AnimatedCard>
-            <AnimatedChartCard>
-              
-              <ChartCardBody>
-                
-                <ChartCardDescription>
-                  Latest week: {weeklyData?.[weeklyData.length - 1]?.resolved_complaints || 22} of {weeklyData?.[weeklyData.length - 1]?.total_complaints || 34} complaints resolved
-                </ChartCardDescription>
-              </ChartCardBody>
-            </AnimatedChartCard>
-          </div>
+          
 
           {/* COBE Globe - Full Width */}
           <div className="w-full">
