@@ -136,11 +136,6 @@ const Index = () => {
             <ReporterOfTheWeek />
           </div>
 
-          {/* Animated Cards Section */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 justify-items-center">
-            <CivicAnimatedCard title="Resolution Rate Analytics" description="Real-time complaint resolution tracking with interactive visualization" mainColor="hsl(var(--success))" secondaryColor="hsl(var(--primary))" />
-          </div>
-
           {/* COBE Globe - Full Width */}
           <div className="w-full">
             <div className="mb-6 text-center">
