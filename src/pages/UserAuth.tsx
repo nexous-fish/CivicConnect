@@ -34,8 +34,8 @@ const UserAuth: React.FC = () => {
     setLoading(true);
 
     try {
-      // Use phone as email for Supabase auth (format: phone@example.com)
-      const emailFormat = `${phone}@example.com`;
+      // Create a valid email format from phone number for Supabase auth
+      const emailFormat = `user${phone}@civicapp.app`;
       
       const { data, error } = await supabase.auth.signUp({
         email: emailFormat,
@@ -73,7 +73,7 @@ const UserAuth: React.FC = () => {
     setLoading(true);
 
     try {
-      const emailFormat = `${phone}@example.com`;
+      const emailFormat = `user${phone}@civicapp.app`;
       
       const { data, error } = await supabase.auth.signInWithPassword({
         email: emailFormat,
