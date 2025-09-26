@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 const UserAuth: React.FC = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
@@ -34,11 +35,8 @@ const UserAuth: React.FC = () => {
     setLoading(true);
 
     try {
-      // Create a valid email format from phone number for Supabase auth
-      const emailFormat = `user${phone}@civicapp.app`;
-      
       const { data, error } = await supabase.auth.signUp({
-        email: emailFormat,
+        email: email,
         password,
         options: {
           data: {
@@ -73,10 +71,8 @@ const UserAuth: React.FC = () => {
     setLoading(true);
 
     try {
-      const emailFormat = `user${phone}@civicapp.app`;
-      
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: emailFormat,
+        email: email,
         password,
       });
 
@@ -145,6 +141,24 @@ const UserAuth: React.FC = () => {
                   </div>
                 </div>
               )}
+
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-slate-700 font-medium">
+                  Email Address
+                </Label>
+                <div className="relative">
+                  <User className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="Enter your email address"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="pl-10 h-12 border-slate-200 focus:border-primary focus:ring-primary"
+                    required
+                  />
+                </div>
+              </div>
 
               <div className="space-y-2">
                 <Label htmlFor="phone" className="text-slate-700 font-medium">
