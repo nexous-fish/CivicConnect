@@ -205,7 +205,7 @@ const OfficerDashboard: React.FC = () => {
           </ErrorBoundary>
           
           <ErrorBoundary>
-            <ComplaintTable cityId={officerData?.city_id} />
+            <ComplaintTable cityId={officerData?.city_id} officerCityId={officerData?.city_id} />
           </ErrorBoundary>
         </div>
       </main>

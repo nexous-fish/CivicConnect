@@ -93,7 +93,7 @@ const OfficerComplaints: React.FC = () => {
         {/* Content */}
         <div className="px-4 sm:px-6">
           <ErrorBoundary>
-            <ComplaintTable cityId={officerData?.city_id} />
+            <ComplaintTable cityId={officerData?.city_id} officerCityId={officerData?.city_id} />
           </ErrorBoundary>
         </div>
       </main>

@@ -15,18 +15,38 @@ import {
 import { Eye, UserPlus, MapPin, Search, Filter, Phone, User } from 'lucide-react';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import ViewComplaintDialog from "@/components/ViewComplaintDialog";
+import AssignComplaintDialog from "@/components/AssignComplaintDialog";
 
 interface ComplaintTableProps {
   cityId?: string;
+  officerCityId?: string;
 }
 
-const ComplaintTable: React.FC<ComplaintTableProps> = ({ cityId }) => {
+const ComplaintTable: React.FC<ComplaintTableProps> = ({ cityId, officerCityId }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [complaints, setComplaints] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showViewDialog, setShowViewDialog] = useState(false);
+  const [showAssignDialog, setShowAssignDialog] = useState(false);
+  const [selectedComplaint, setSelectedComplaint] = useState<any>(null);
   const { toast } = useToast();
+
+  const handleViewComplaint = (complaint: any) => {
+    setSelectedComplaint(complaint);
+    setShowViewDialog(true);
+  };
+
+  const handleAssignComplaint = (complaint: any) => {
+    setSelectedComplaint(complaint);
+    setShowAssignDialog(true);
+  };
+
+  const handleDialogSuccess = () => {
+    fetchComplaints();
+  };
 
   useEffect(() => {
     fetchComplaints();
@@ -244,6 +264,7 @@ const ComplaintTable: React.FC<ComplaintTableProps> = ({ cityId }) => {
                             variant="outline" 
                             size="sm" 
                             className="h-8 px-3 hover-lift border-border/50 hover:border-primary hover:text-primary"
+                            onClick={() => handleViewComplaint(complaint)}
                           >
                             <Eye className="h-3 w-3 mr-1" />
                             View
@@ -252,6 +273,7 @@ const ComplaintTable: React.FC<ComplaintTableProps> = ({ cityId }) => {
                             <Button 
                               size="sm" 
                               className="h-8 px-3 hover-lift civic-gradient text-white hover:opacity-90"
+                              onClick={() => handleAssignComplaint(complaint)}
                             >
                               <UserPlus className="h-3 w-3 mr-1" />
                               Assign
@@ -274,6 +296,21 @@ const ComplaintTable: React.FC<ComplaintTableProps> = ({ cityId }) => {
           </div>
         )}
       </CardContent>
+
+      {/* Dialogs */}
+      <ViewComplaintDialog
+        isOpen={showViewDialog}
+        onClose={() => setShowViewDialog(false)}
+        complaint={selectedComplaint}
+      />
+      
+      <AssignComplaintDialog
+        isOpen={showAssignDialog}
+        onClose={() => setShowAssignDialog(false)}
+        onSuccess={handleDialogSuccess}
+        complaint={selectedComplaint}
+        officerCityId={officerCityId || ''}
+      />
     </Card>
   );
 };
