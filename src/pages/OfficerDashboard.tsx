@@ -145,7 +145,7 @@ const OfficerDashboard: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-civic-light via-background to-primary-light/30">
       <NavBar items={navItems} />
       
-      <main className="pt-16 sm:pt-20 pb-20 sm:pb-6">
+      <main className="pt-12 sm:pt-16 pb-20 sm:pb-6">
         {/* Header */}
         <div className="px-4 sm:px-6 py-4 sm:py-6 bg-background/80 backdrop-blur-sm border border-border mx-2 sm:mx-4 rounded-xl mb-6 mt-2 sm:mt-4 shadow-card-shadow">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
