@@ -1,7 +1,7 @@
 # Crowdsourced Civic Issue Reporting and Resolution System (SIH)
 
 Repository: Crowdsourced Civic Issue Reporting and Resolution System
-Problem Statement: SIH (Smart India Hackathon) — Civic issue reporting, tracking and resolution pipeline
+Problem Statement: SIH (Smart India Hackathon) Civic issue reporting, tracking and resolution pipeline
 
 A complete system to enable citizens to report civic problems (roads, sewage, drainage, street lights, waste, etc.) via web, WhatsApp (or other chat channels), and mobile; automatically collect more details via an AI call/IVR; route reports to the correct nodal officer and contractors for each city/zone; provide dashboards for citizens, nodal officers and contractors; and track issue resolution end-to-end.
 
