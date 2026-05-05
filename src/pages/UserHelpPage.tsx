@@ -54,11 +54,7 @@ const UserHelpPage: React.FC = () => {
       }
 
       setUser(session.user);
-<<<<<<< HEAD
-      await loadUserData(session.user.id);
-=======
       await loadUserData(session.user);
->>>>>>> 66c5132 (initial commit)
     } catch (error) {
       console.error('Auth check failed:', error);
       navigate('/user-auth');
@@ -67,22 +63,11 @@ const UserHelpPage: React.FC = () => {
     }
   };
 
-<<<<<<< HEAD
-  const loadUserData = async (userId: string) => {
-=======
   const loadUserData = async (authUser: any) => {
->>>>>>> 66c5132 (initial commit)
     try {
       const { data: profileData, error: profileError } = await supabase
         .from('user_profiles')
         .select('*')
-<<<<<<< HEAD
-        .eq('user_id', userId)
-        .single();
-
-      if (profileError) throw profileError;
-      setProfile(profileData);
-=======
         .eq('user_id', authUser.id)
         .maybeSingle();
 
@@ -111,7 +96,6 @@ const UserHelpPage: React.FC = () => {
       }
 
       setProfile(resolvedProfile);
->>>>>>> 66c5132 (initial commit)
       
     } catch (error: any) {
       toast({

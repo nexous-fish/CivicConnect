@@ -7,11 +7,6 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-<<<<<<< HEAD
-=======
-.env
-
->>>>>>> 66c5132 (initial commit)
 node_modules
 dist
 dist-ssr

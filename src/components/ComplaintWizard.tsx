@@ -9,10 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { Upload, Camera, MapPin, Phone, FileText, CheckCircle, ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-<<<<<<< HEAD
-=======
 import LocationPicker from "./LocationPicker";
->>>>>>> 66c5132 (initial commit)
 
 interface ComplaintData {
   photo: File | null;
@@ -20,11 +17,8 @@ interface ComplaintData {
   city_id: string;
   nagar_id: string;
   address: string;
-<<<<<<< HEAD
-=======
   latitude: number | null;
   longitude: number | null;
->>>>>>> 66c5132 (initial commit)
   name: string;
   phone: string;
   details: string;
@@ -57,11 +51,8 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     city_id: '',
     nagar_id: '',
     address: '',
-<<<<<<< HEAD
-=======
     latitude: null,
     longitude: null,
->>>>>>> 66c5132 (initial commit)
     name: '',
     phone: '',
     details: '',
@@ -157,8 +148,6 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   ];
 
   const handleNext = () => {
-<<<<<<< HEAD
-=======
     // Validate current step before moving to next
     if (currentStep === 1 && !complaintData.category) {
       toast({
@@ -201,7 +190,6 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
       return;
     }
 
->>>>>>> 66c5132 (initial commit)
     if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
     }
@@ -219,8 +207,6 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     try {
       console.log('Starting complaint submission...', complaintData);
       
-<<<<<<< HEAD
-=======
       // Validate required fields
       if (!complaintData.name || !complaintData.phone || !complaintData.details) {
         toast({
@@ -262,7 +248,6 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         return;
       }
       
->>>>>>> 66c5132 (initial commit)
       // Upload photo to Supabase storage if available
       let photoUrl = null;
       if (complaintData.photo) {
@@ -309,11 +294,8 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           city_id: complaintData.city_id,
           nagar_id: complaintData.nagar_id,
           address: complaintData.address,
-<<<<<<< HEAD
-=======
           latitude: complaintData.latitude,
           longitude: complaintData.longitude,
->>>>>>> 66c5132 (initial commit)
           citizen_name: complaintData.name,
           citizen_phone: complaintData.phone,
           description: complaintData.details,
@@ -326,10 +308,7 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
       if (error) {
         console.error('Database error:', error);
-<<<<<<< HEAD
-=======
         console.error('Error details:', error.message, error.details, error.hint);
->>>>>>> 66c5132 (initial commit)
         toast({
           title: "Submission failed",
           description: `Failed to submit complaint: ${error.message}`,
@@ -619,8 +598,6 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           {/* Step 3: Location Selection */}
           {currentStep === 3 && (
             <div className="space-y-4">
-<<<<<<< HEAD
-=======
               {/* Map Component */}
               <LocationPicker 
                 onLocationSelect={(location) => {
@@ -638,7 +615,6 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
               />
 
               {/* State Selection */}
->>>>>>> 66c5132 (initial commit)
               <div>
                 <Label htmlFor="state">State</Label>
                 <Select 
@@ -660,10 +636,7 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                 </Select>
               </div>
 
-<<<<<<< HEAD
-=======
               {/* City Selection */}
->>>>>>> 66c5132 (initial commit)
               <div>
                 <Label htmlFor="city">City</Label>
                 <Select 
@@ -692,10 +665,7 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                 </Select>
               </div>
 
-<<<<<<< HEAD
-=======
               {/* Nagar/Ward Selection */}
->>>>>>> 66c5132 (initial commit)
               <div>
                 <Label htmlFor="nagar">Nagar/Ward</Label>
                 <Select 
@@ -724,29 +694,17 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                 </Select>
               </div>
               
-<<<<<<< HEAD
-=======
               {/* Address Input */}
->>>>>>> 66c5132 (initial commit)
               <div>
                 <Label htmlFor="address">Address</Label>
                 <Textarea
                   id="address"
-<<<<<<< HEAD
-                  placeholder="Enter the exact location address..."
-=======
                   placeholder="Enter the exact location address... (auto-filled from map)"
->>>>>>> 66c5132 (initial commit)
                   value={complaintData.address}
                   onChange={(e) => setComplaintData({ ...complaintData, address: e.target.value })}
                 />
               </div>
 
-<<<<<<< HEAD
-              <div className="bg-muted/50 p-3 rounded-lg">
-                <p className="text-xs text-muted-foreground">
-                  📍 Tip: Be as specific as possible with the address for faster resolution
-=======
               {/* GPS Coordinates Display */}
               {complaintData.latitude && complaintData.longitude && (
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 space-y-1">
@@ -760,7 +718,6 @@ const ComplaintWizard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
               <div className="bg-muted/50 p-3 rounded-lg">
                 <p className="text-xs text-muted-foreground">
                   📍 Tip: Use the map above to pinpoint the exact location, or enable location services for GPS coordinates.
->>>>>>> 66c5132 (initial commit)
                 </p>
               </div>
             </div>
