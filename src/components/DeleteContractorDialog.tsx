@@ -59,7 +59,11 @@ const DeleteContractorDialog: React.FC<DeleteContractorDialogProps> = ({
       console.error('Error deleting contractor:', error);
       toast({
         title: "Error",
+<<<<<<< HEAD
         description: "Failed to remove contractor",
+=======
+        description: error instanceof Error ? error.message : "Failed to remove contractor",
+>>>>>>> 66c5132 (initial commit)
         variant: "destructive",
       });
     } finally {

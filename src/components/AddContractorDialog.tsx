@@ -106,7 +106,11 @@ const AddContractorDialog: React.FC<AddContractorDialogProps> = ({
       console.error('Error adding contractor:', error);
       toast({
         title: "Error",
+<<<<<<< HEAD
         description: "Failed to add contractor",
+=======
+        description: error instanceof Error ? error.message : "Failed to add contractor",
+>>>>>>> 66c5132 (initial commit)
         variant: "destructive",
       });
     } finally {

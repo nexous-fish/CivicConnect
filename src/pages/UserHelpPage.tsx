@@ -54,7 +54,11 @@ const UserHelpPage: React.FC = () => {
       }
 
       setUser(session.user);
+<<<<<<< HEAD
       await loadUserData(session.user.id);
+=======
+      await loadUserData(session.user);
+>>>>>>> 66c5132 (initial commit)
     } catch (error) {
       console.error('Auth check failed:', error);
       navigate('/user-auth');
@@ -63,16 +67,51 @@ const UserHelpPage: React.FC = () => {
     }
   };
 
+<<<<<<< HEAD
   const loadUserData = async (userId: string) => {
+=======
+  const loadUserData = async (authUser: any) => {
+>>>>>>> 66c5132 (initial commit)
     try {
       const { data: profileData, error: profileError } = await supabase
         .from('user_profiles')
         .select('*')
+<<<<<<< HEAD
         .eq('user_id', userId)
         .single();
 
       if (profileError) throw profileError;
       setProfile(profileData);
+=======
+        .eq('user_id', authUser.id)
+        .maybeSingle();
+
+      if (profileError) throw profileError;
+      let resolvedProfile = profileData;
+
+      if (!resolvedProfile) {
+        const fallbackProfile = {
+          user_id: authUser.id,
+          phone: authUser.user_metadata?.phone || authUser.phone || authUser.email || authUser.id,
+          full_name: authUser.user_metadata?.full_name || authUser.user_metadata?.fullName || authUser.email || 'User',
+        };
+
+        const { data: insertedProfile, error: insertError } = await supabase
+          .from('user_profiles')
+          .insert(fallbackProfile)
+          .select('*')
+          .maybeSingle();
+
+        if (insertError) throw insertError;
+        resolvedProfile = insertedProfile;
+      }
+
+      if (!resolvedProfile) {
+        throw new Error('Unable to load or create user profile');
+      }
+
+      setProfile(resolvedProfile);
+>>>>>>> 66c5132 (initial commit)
       
     } catch (error: any) {
       toast({

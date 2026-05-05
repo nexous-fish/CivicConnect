@@ -129,7 +129,11 @@ const EditContractorDialog: React.FC<EditContractorDialogProps> = ({
       console.error('Error updating contractor:', error);
       toast({
         title: "Error",
+<<<<<<< HEAD
         description: "Failed to update contractor",
+=======
+        description: error instanceof Error ? error.message : "Failed to update contractor",
+>>>>>>> 66c5132 (initial commit)
         variant: "destructive",
       });
     } finally {
